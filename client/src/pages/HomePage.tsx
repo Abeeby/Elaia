@@ -135,14 +135,14 @@ export default function HomePage() {
                   <div>
                     <h3 className="font-inter font-semibold text-elaia-charcoal mb-2">Excellence</h3>
                     <p className="text-elaia-warm-gray">Formation continue et équipement premium</p>
-            </div>
+                  </div>
                 </div>
                 <div className="flex items-start">
                   <div className="w-1 h-16 bg-ohemia-accent mr-6"></div>
                   <div>
                     <h3 className="font-inter font-semibold text-elaia-charcoal mb-2">Personnalisation</h3>
                     <p className="text-elaia-warm-gray">Cours adaptés à vos besoins et objectifs</p>
-                </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -190,7 +190,7 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-            </div>
+          </div>
             
           {/* Contenu du cours sélectionné */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -239,7 +239,7 @@ export default function HomePage() {
           </h2>
           <p className="text-2xl font-lora italic text-ohemia-accent mb-8">
             Votre première expérience ELAÏA
-            </p>
+          </p>
           <div className="max-w-xl mx-auto bg-elaia-white p-12 shadow-lg">
             <p className="text-5xl font-playfair text-elaia-charcoal mb-4">
               45 CHF
