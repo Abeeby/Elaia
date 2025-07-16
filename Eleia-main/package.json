@@ -1,0 +1,26 @@
+{
+  "name": "elaia-studio-app",
+  "version": "1.0.0",
+  "description": "Application de gestion pour Elaia Studio - Pilates Reformer",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "Elaia Studio",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.2",
+    "axios": "^1.10.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.0.0",
+    "sqlite3": "^5.1.7"
+  }
+}

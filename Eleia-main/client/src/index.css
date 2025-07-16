@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-elaia-cream text-elaia-charcoal font-inter antialiased;
+  }
+  
+  h1, h2, h3 {
+    @apply font-playfair;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-elaia-charcoal text-elaia-white px-8 py-4 rounded-none font-medium text-sm uppercase tracking-wider transition-all duration-300 hover:bg-elaia-warm-gray transform hover:-translate-y-0.5;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent text-elaia-charcoal border-2 border-elaia-charcoal px-8 py-4 rounded-none font-medium text-sm uppercase tracking-wider transition-all duration-300 hover:bg-elaia-charcoal hover:text-elaia-white;
+  }
+  
+  .btn-accent {
+    @apply bg-ohemia-accent text-elaia-white px-8 py-4 rounded-none font-medium text-sm uppercase tracking-wider transition-all duration-300 hover:bg-opacity-90 transform hover:-translate-y-0.5;
+  }
+  
+  .card {
+    @apply bg-elaia-white shadow-sm p-8 transition-all duration-300 hover:shadow-xl border border-elaia-muted;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border-b-2 border-elaia-muted bg-transparent focus:outline-none focus:border-elaia-charcoal transition-colors duration-300;
+  }
+  
+  .section-padding {
+    @apply py-24 md:py-32;
+  }
+  
+  .container-custom {
+    @apply max-w-7xl mx-auto px-6 md:px-8 lg:px-12;
+  }
+}
+
+/* Animations Ohemia style */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes lineGrow {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Text styles */
+.heading-xl {
+  @apply text-5xl md:text-6xl lg:text-7xl font-playfair font-light leading-tight;
+}
+
+.heading-lg {
+  @apply text-4xl md:text-5xl font-playfair font-light leading-tight;
+}
+
+.heading-md {
+  @apply text-2xl md:text-3xl font-playfair font-normal;
+}
+
+.heading-sm {
+  @apply text-xl md:text-2xl font-playfair font-normal;
+}
+
+.body-lg {
+  @apply text-lg font-inter font-light leading-relaxed;
+}
+
+.body-md {
+  @apply text-base font-inter font-light leading-relaxed;
+}
+
+/* Hover effects Ohemia style */
+.hover-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.3s ease;
+}
+
+.hover-underline:hover::after {
+  width: 100%;
+}
+
+/* Image overlay effect */
+.image-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease;
+}
+
+.image-overlay:hover::before {
+  opacity: 0;
+}
+
+/* Parallax scrolling effect */
+.parallax {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Modern card hover */
+.modern-card {
+  @apply relative overflow-hidden transition-all duration-500;
+}
+
+.modern-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.7s;
+}
+
+.modern-card:hover::before {
+  left: 100%;
+}
+
+/* Custom scrollbar Ohemia style */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8f8f8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #B5985A;
+  transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9A7E48;
+}
+
+/* Loading states */
+.skeleton {
+  @apply animate-pulse bg-elaia-muted;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+  background-color: #B5985A;
+  color: white;
+}
+
+/* Focus styles */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #B5985A;
+  outline-offset: 2px;
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  .heading-xl {
+    @apply text-4xl;
+  }
+  
+  .heading-lg {
+    @apply text-3xl;
+  }
+  
+  .heading-md {
+    @apply text-2xl;
+  }
+  
+  .heading-sm {
+    @apply text-xl;
+  }
+}
