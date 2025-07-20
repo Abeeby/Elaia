@@ -116,10 +116,10 @@ export default function DashboardPage() {
             {nextBooking ? (
               <div>
                 <p className="font-semibold text-elaia-gray">
-                  {format(new Date(nextBooking.start_time), 'dd MMM', { locale: fr })}
+                  {nextBooking.start_time ? format(new Date(nextBooking.start_time), 'dd MMM', { locale: fr }) : 'Date à venir'}
                 </p>
                 <p className="text-sm text-gray-600">
-                  {format(new Date(nextBooking.start_time), 'HH:mm')} - {nextBooking.class_type_name}
+                  {nextBooking.start_time ? format(new Date(nextBooking.start_time), 'HH:mm') : '--:--'} - {nextBooking.class_type_name || 'Cours'}
                 </p>
               </div>
             ) : (
@@ -227,7 +227,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="font-medium text-elaia-gray">{booking.class_type_name}</p>
                     <p className="text-sm text-gray-600">
-                      {format(new Date(booking.start_time), 'EEEE d MMMM à HH:mm', { locale: fr })}
+                                              {booking.start_time ? format(new Date(booking.start_time), 'EEEE d MMMM à HH:mm', { locale: fr }) : 'Date non définie'}
                     </p>
                   </div>
                   <div className="text-right">

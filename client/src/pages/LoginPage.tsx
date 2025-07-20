@@ -197,6 +197,33 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* Demo accounts */}
+          <div className="mt-6 space-y-3">
+            <p className="text-sm text-center text-elaia-warm-gray">Comptes de démonstration :</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('email', 'demo@example.com');
+                  setValue('password', 'demo123');
+                }}
+                className="px-4 py-2 bg-elaia-sand/20 text-elaia-charcoal rounded-lg text-sm hover:bg-elaia-sand/30 transition-colors"
+              >
+                Client démo
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setValue('email', 'admin@example.com');
+                  setValue('password', 'admin123');
+                }}
+                className="px-4 py-2 bg-elaia-sage/20 text-elaia-charcoal rounded-lg text-sm hover:bg-elaia-sage/30 transition-colors"
+              >
+                Admin démo
+              </button>
+            </div>
+          </div>
+
           {/* Divider */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
