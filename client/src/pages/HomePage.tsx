@@ -12,54 +12,63 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion || !logoRef.current) return;
+    try {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion || !logoRef.current || !heroRef.current) return;
 
-    const logo = logoRef.current;
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: heroRef.current,
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 1,
-      }
-    });
-
-    // Animation du logo en plusieurs étapes comme Ohemia
-    tl.to(logo, {
-      scale: 0.3,
-      y: -window.innerHeight * 0.35,
-      x: -window.innerWidth * 0.35,
-      duration: 1,
-      ease: 'power2.inOut'
-    })
-    .to(logo.querySelector('.logo-text'), {
-      opacity: 0,
-      duration: 0.3
-    }, '<0.5')
-    .to(logo, {
-      opacity: 0,
-      duration: 0.3
-    }, '>');
-
-    // Parallax effect for images
-    const images = document.querySelectorAll<HTMLElement>('.parallax-image');
-    images.forEach((img) => {
-      gsap.to(img, {
-        yPercent: -20,
-        ease: 'none',
+      const logo = logoRef.current;
+      const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: img,
-          start: 'top bottom',
+          trigger: heroRef.current,
+          start: 'top top',
           end: 'bottom top',
-          scrub: true
+          scrub: 1,
         }
       });
-    });
 
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+      // Animation du logo en plusieurs étapes comme Ohemia
+      tl.to(logo, {
+        scale: 0.3,
+        y: -window.innerHeight * 0.35,
+        x: -window.innerWidth * 0.35,
+        duration: 1,
+        ease: 'power2.inOut'
+      });
+      
+      const logoText = logo.querySelector('.logo-text');
+      if (logoText) {
+        tl.to(logoText, {
+          opacity: 0,
+          duration: 0.3
+        }, '<0.5');
+      }
+      
+      tl.to(logo, {
+        opacity: 0,
+        duration: 0.3
+      }, '>');
+
+      // Parallax effect for images
+      const images = document.querySelectorAll<HTMLElement>('.parallax-image');
+      images.forEach((img) => {
+        gsap.to(img, {
+          yPercent: -20,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: img,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        });
+      });
+
+      return () => {
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      };
+    } catch (error) {
+      console.error('Error in HomePage animations:', error);
+    }
   }, []);
 
   return (
