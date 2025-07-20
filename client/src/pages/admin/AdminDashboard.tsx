@@ -1,9 +1,34 @@
 import { useQuery } from '@tanstack/react-query';
-import { Users, TrendingUp, Calendar, CreditCard, Activity, Award, Clock, Euro } from 'lucide-react';
-import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { Users, TrendingUp, Calendar, CreditCard, Activity, Award, Clock, Euro, ArrowUp, ArrowDown } from 'lucide-react';
+import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { adminService } from '../../services/api';
 import { Link } from 'react-router-dom';
+import { Line, Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 export default function AdminDashboard() {
   // Récupérer les statistiques
@@ -38,256 +63,237 @@ export default function AdminDashboard() {
     return Math.round(((current - previous) / previous) * 100);
   };
 
+  // Données pour le graphique de revenus
+  const revenueData = {
+    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+    datasets: [
+      {
+        label: 'Revenus mensuels',
+        data: [12000, 15000, 13500, 17000, 16000, 19000],
+        borderColor: '#D6B88F',
+        backgroundColor: 'rgba(214, 184, 143, 0.1)',
+        tension: 0.4,
+        fill: true,
+      },
+    ],
+  };
+
+  // Données pour le graphique des réservations
+  const bookingsData = {
+    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+    datasets: [
+      {
+        label: 'Réservations',
+        data: [45, 52, 48, 58, 55, 42, 38],
+        backgroundColor: '#2C3E3D',
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.05)',
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+    },
+  };
+
+  const statsCards = [
+    {
+      title: 'Clients actifs',
+      value: stats?.activeClients || 0,
+      previousValue: stats?.previousActiveClients || 0,
+      icon: Users,
+      color: 'bg-blue-500',
+      bgColor: 'bg-blue-50',
+    },
+    {
+      title: 'Revenus du mois',
+      value: formatCurrency(stats?.monthlyRevenue || 0),
+      previousValue: stats?.previousMonthlyRevenue || 0,
+      icon: Euro,
+      color: 'bg-green-500',
+      bgColor: 'bg-green-50',
+    },
+    {
+      title: 'Réservations',
+      value: stats?.monthlyBookings || 0,
+      previousValue: stats?.previousMonthlyBookings || 0,
+      icon: Calendar,
+      color: 'bg-purple-500',
+      bgColor: 'bg-purple-50',
+    },
+    {
+      title: 'Taux de remplissage',
+      value: `${stats?.occupancyRate || 0}%`,
+      previousValue: stats?.previousOccupancyRate || 0,
+      icon: Activity,
+      color: 'bg-orange-500',
+      bgColor: 'bg-orange-50',
+    },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ohemia-accent"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="py-8 bg-elaia-beige min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-elaia-gray mb-2">
-            Tableau de bord administrateur
-          </h1>
-          <p className="text-lg text-elaia-gray">
-            Vue d'ensemble de l'activité d'Elaïa Studio
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Tableau de bord
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Bienvenue dans votre espace d'administration
+              </p>
+            </div>
+            <div className="text-sm text-gray-500">
+              {format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {statsCards.map((stat, index) => {
+            const growth = calculateGrowth(
+              typeof stat.value === 'string' ? parseFloat(stat.value) : stat.value,
+              stat.previousValue
+            );
+            const isPositive = growth >= 0;
+
+            return (
+              <div key={index} className="bg-white rounded-lg shadow p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+                    <stat.icon className={`h-6 w-6 ${stat.color.replace('bg-', 'text-')}`} />
+                  </div>
+                  <div className={`flex items-center text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                    {isPositive ? <ArrowUp className="h-4 w-4 mr-1" /> : <ArrowDown className="h-4 w-4 mr-1" />}
+                    {Math.abs(growth)}%
+                  </div>
+                </div>
+                <h3 className="text-sm font-medium text-gray-500 mb-1">{stat.title}</h3>
+                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+              </div>
+            );
+          })}
         </div>
 
-        {isLoading ? (
-          <div className="text-center py-12">
-            <p className="text-elaia-gray">Chargement des statistiques...</p>
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Évolution des revenus</h3>
+            <div className="h-64">
+              <Line data={revenueData} options={chartOptions} />
+            </div>
           </div>
-        ) : (
-          <>
-            {/* Cartes de statistiques principales */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {/* Clients actifs */}
-              <div className="card">
-                <div className="flex items-center justify-between mb-4">
-                  <Users className="h-8 w-8 text-elaia-gold" />
-                  <span className={`text-sm font-medium ${
-                    stats?.growth?.active_clients > 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {stats?.growth?.active_clients > 0 ? '+' : ''}{stats?.growth?.active_clients}%
-                  </span>
-                </div>
-                <p className="text-2xl font-bold text-elaia-gray">
-                  {stats?.active_clients || 0}
-                </p>
-                <p className="text-sm text-gray-600">Clients actifs</p>
-              </div>
-
-              {/* Revenus du mois */}
-              <div className="card">
-                <div className="flex items-center justify-between mb-4">
-                  <Euro className="h-8 w-8 text-elaia-green" />
-                  <span className={`text-sm font-medium ${
-                    stats?.growth?.revenue > 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {stats?.growth?.revenue > 0 ? '+' : ''}{stats?.growth?.revenue}%
-                  </span>
-                </div>
-                <p className="text-2xl font-bold text-elaia-gray">
-                  {formatCurrency(stats?.revenue_this_month || 0)}
-                </p>
-                <p className="text-sm text-gray-600">Revenus ce mois</p>
-              </div>
-
-              {/* Réservations du mois */}
-              <div className="card">
-                <div className="flex items-center justify-between mb-4">
-                  <Calendar className="h-8 w-8 text-elaia-mint" />
-                  <span className={`text-sm font-medium ${
-                    stats?.growth?.bookings > 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {stats?.growth?.bookings > 0 ? '+' : ''}{stats?.growth?.bookings}%
-                  </span>
-                </div>
-                <p className="text-2xl font-bold text-elaia-gray">
-                  {stats?.bookings_this_month || 0}
-                </p>
-                <p className="text-sm text-gray-600">Réservations ce mois</p>
-              </div>
-
-              {/* Taux d'occupation */}
-              <div className="card">
-                <div className="flex items-center justify-between mb-4">
-                  <Activity className="h-8 w-8 text-elaia-rose" />
-                  <TrendingUp className="h-5 w-5 text-gray-400" />
-                </div>
-                <p className="text-2xl font-bold text-elaia-gray">
-                  {stats?.occupancy_rate || 0}%
-                </p>
-                <p className="text-sm text-gray-600">Taux d'occupation</p>
-              </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Réservations par jour</h3>
+            <div className="h-64">
+              <Bar data={bookingsData} options={chartOptions} />
             </div>
+          </div>
+        </div>
 
-            {/* Graphiques et tableaux */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              {/* Statistiques détaillées */}
-              <div className="card">
-                <h2 className="text-xl font-semibold text-elaia-gray mb-6">
-                  Statistiques détaillées
-                </h2>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center py-3 border-b">
-                    <span className="text-gray-600">Nouveaux clients ce mois</span>
-                    <span className="font-semibold text-elaia-gray">
-                      {stats?.new_clients_this_month || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b">
-                    <span className="text-gray-600">Taux de rétention</span>
-                    <span className="font-semibold text-elaia-gray">
-                      {stats?.retention_rate || 0}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b">
-                    <span className="text-gray-600">Moyenne de séances/client</span>
-                    <span className="font-semibold text-elaia-gray">
-                      {stats?.avg_sessions_per_client?.toFixed(1) || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b">
-                    <span className="text-gray-600">Crédits vendus ce mois</span>
-                    <span className="font-semibold text-elaia-gray">
-                      {stats?.credits_sold_this_month || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-3">
-                    <span className="text-gray-600">Abonnements actifs</span>
-                    <span className="font-semibold text-elaia-gray">
-                      {stats?.active_subscriptions || 0}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Top des cours */}
-              <div className="card">
-                <h2 className="text-xl font-semibold text-elaia-gray mb-6">
-                  Cours les plus populaires
-                </h2>
-                {stats?.popular_classes && stats.popular_classes.length > 0 ? (
-                  <div className="space-y-4">
-                    {stats.popular_classes.map((cls: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold mr-3 ${
-                            index === 0 ? 'bg-elaia-gold' : 
-                            index === 1 ? 'bg-elaia-green' : 
-                            'bg-elaia-rose'
-                          }`}>
-                            {index + 1}
-                          </div>
-                          <div>
-                            <p className="font-medium text-elaia-gray">{cls.name}</p>
-                            <p className="text-sm text-gray-600">{cls.instructor}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-elaia-gray">{cls.bookings}</p>
-                          <p className="text-sm text-gray-600">réservations</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-gray-600 py-8">
-                    Aucune donnée disponible
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Réservations récentes */}
-            <div className="card">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-elaia-gray">
-                  Réservations récentes
-                </h2>
-                <Link to="/admin/bookings" className="text-sm text-elaia-gold hover:text-elaia-green">
-                  Voir tout
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Bookings */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Réservations récentes</h3>
+                <Link to="/admin/bookings" className="text-sm text-ohemia-accent hover:text-ohemia-accent/80">
+                  Voir tout →
                 </Link>
               </div>
-              
-              {recentBookings && recentBookings.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead>
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Client
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Cours
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Statut
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {recentBookings.map((booking: any) => (
-                        <tr key={booking.id}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">
-                              {booking.client_name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {booking.client_email}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {booking.class_name}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {format(new Date(booking.start_time), 'dd/MM HH:mm')}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              booking.status === 'confirmed' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {booking.status === 'confirmed' ? 'Confirmé' : 'Annulé'}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            </div>
+            <div className="divide-y">
+              {recentBookings?.slice(0, 5).map((booking: any) => (
+                <div key={booking.id} className="p-4 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {booking.user?.first_name} {booking.user?.last_name}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {booking.class?.name} - {format(new Date(booking.class?.start_time), 'dd/MM à HH:mm')}
+                      </p>
+                    </div>
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      booking.status === 'confirmed' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {booking.status === 'confirmed' ? 'Confirmé' : 'En attente'}
+                    </span>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-center text-gray-600 py-8">
-                  Aucune réservation récente
-                </p>
-              )}
+              ))}
             </div>
+          </div>
 
-            {/* Actions rapides */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <Link to="/admin/classes" className="card hover:shadow-lg transition-all text-center">
-                <Calendar className="h-12 w-12 text-elaia-gold mx-auto mb-4" />
-                <h3 className="font-semibold text-elaia-gray mb-2">Gérer le planning</h3>
-                <p className="text-sm text-gray-600">Ajouter ou modifier des cours</p>
-              </Link>
-              
-              <Link to="/admin/users" className="card hover:shadow-lg transition-all text-center">
-                <Users className="h-12 w-12 text-elaia-green mx-auto mb-4" />
-                <h3 className="font-semibold text-elaia-gray mb-2">Gérer les utilisateurs</h3>
-                <p className="text-sm text-gray-600">Voir et gérer les crédits des utilisateurs</p>
-              </Link>
-              
-              <Link to="/admin/reports" className="card hover:shadow-lg transition-all text-center">
-                <TrendingUp className="h-12 w-12 text-elaia-mint mx-auto mb-4" />
-                <h3 className="font-semibold text-elaia-gray mb-2">Rapports détaillés</h3>
-                <p className="text-sm text-gray-600">Analyses et statistiques avancées</p>
-              </Link>
+          {/* New Clients */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Nouveaux clients</h3>
+                <Link to="/admin/users" className="text-sm text-ohemia-accent hover:text-ohemia-accent/80">
+                  Voir tout →
+                </Link>
+              </div>
             </div>
-          </>
-        )}
+            <div className="divide-y">
+              {newClients?.slice(0, 5).map((client: any) => (
+                <div key={client.id} className="p-4 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-elaia-warm-gray/20 flex items-center justify-center mr-3">
+                        <span className="text-sm font-medium text-elaia-charcoal">
+                          {client.first_name?.[0]}{client.last_name?.[0]}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {client.first_name} {client.last_name}
+                        </p>
+                        <p className="text-sm text-gray-500">{client.email}</p>
+                      </div>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {format(new Date(client.created_at), 'dd/MM')}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
