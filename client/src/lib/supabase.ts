@@ -1,41 +1,137 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-// Créer un client Supabase même avec des valeurs par défaut
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: false, // Désactiver la persistence en mode démo
-    autoRefreshToken: false,
+// Vérifier si Supabase est configuré
+const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
+
+if (!isSupabaseConfigured) {
+  console.warn('Supabase non configuré - Mode démo activé');
+}
+
+// Créer un client Supabase avec des valeurs par défaut si nécessaire
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-key',
+  {
+    auth: {
+      persistSession: isSupabaseConfigured,
+      autoRefreshToken: isSupabaseConfigured,
+    }
   }
-});
+);
 
 // Helper functions pour l'authentification
 export const supabaseAuth = {
   async signIn(email: string, password: string) {
-    // En mode démo, toujours retourner une erreur pour forcer l'utilisation du mode démo dans authStore
-    throw new Error('Supabase non configuré - Mode démo activé');
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase non configuré - Mode démo activé');
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) throw error;
+    
+    // Récupérer les infos utilisateur depuis la table users
+    if (data.user) {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (userError) {
+        // Si la table users n'existe pas ou l'utilisateur n'y est pas, utiliser les métadonnées
+        return {
+          user: {
+            id: data.user.id,
+            email: data.user.email!,
+            first_name: data.user.user_metadata?.first_name || '',
+            last_name: data.user.user_metadata?.last_name || '',
+            phone: data.user.user_metadata?.phone || '',
+            role: data.user.user_metadata?.role || 'client',
+            credits: data.user.user_metadata?.credits || 0,
+          },
+          session: data.session,
+        };
+      }
+      
+      return {
+        user: userData,
+        session: data.session,
+      };
+    }
+    
+    return data;
   },
   
   async signUp(email: string, password: string, metadata: any) {
-    throw new Error('Supabase non configuré - Mode démo activé');
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase non configuré - Mode démo activé');
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+      },
+    });
+    
+    if (error) throw error;
+    return data;
   },
   
   async signOut() {
-    // Ne rien faire en mode démo
+    if (!isSupabaseConfigured) return;
+    
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
   },
   
   async getUser() {
-    // Toujours retourner null en mode démo
+    if (!isSupabaseConfigured) return null;
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (error) {
+        // Utiliser les métadonnées si la table users n'est pas accessible
+        return {
+          id: user.id,
+          email: user.email!,
+          first_name: user.user_metadata?.first_name || '',
+          last_name: user.user_metadata?.last_name || '',
+          phone: user.user_metadata?.phone || '',
+          role: user.user_metadata?.role || 'client',
+          credits: user.user_metadata?.credits || 0,
+        };
+      }
+      
+      return userData;
+    }
+    
     return null;
   },
   
   onAuthStateChange(callback: (event: any, session: any) => void) {
-    // Ne rien faire en mode démo
-    return {
-      data: { subscription: { unsubscribe: () => {} } }
-    };
+    if (!isSupabaseConfigured) {
+      return {
+        data: { subscription: { unsubscribe: () => {} } }
+      };
+    }
+    
+    return supabase.auth.onAuthStateChange(callback);
   },
 };
 
@@ -85,14 +181,9 @@ export interface User {
   first_name: string;
   last_name: string;
   phone?: string;
-  address?: string;
-  city?: string;
-  postal_code?: string;
-  role: 'client' | 'admin' | 'instructor';
-  credits: number;
-  is_verified: boolean;
-  created_at: string;
-  updated_at: string;
+  role: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ClassSession {

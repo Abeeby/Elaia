@@ -76,30 +76,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      // Mode démo - vérifier les comptes de test
-      if (email === 'admin@elaiastudio.ch' && password === 'admin123') {
-        const demoUser = DEMO_USERS['admin@elaiastudio.ch'];
-        set({ 
-          user: demoUser as User, 
-          isAuthenticated: true,
-          isLoading: false 
-        });
-        customToast.success('Connexion réussie (mode démo)');
-        return;
-      }
-      
-      if (email === 'marie.dupont@email.com' && password === 'client123') {
-        const demoUser = DEMO_USERS['marie.dupont@email.com'];
-        set({ 
-          user: demoUser as User, 
-          isAuthenticated: true,
-          isLoading: false 
-        });
-        customToast.success('Connexion réussie (mode démo)');
-        return;
-      }
-
-      // Tentative de connexion avec Supabase
+      // Essayer d'abord avec Supabase
       try {
         const { user } = await supabaseAuth.signIn(email, password);
         set({ 
@@ -108,12 +85,42 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isLoading: false 
         });
         customToast.success('Connexion réussie');
-      } catch (supabaseError) {
-        // Si Supabase échoue, vérifier si c'est un compte démo
-        throw new Error('Email ou mot de passe incorrect');
+        return;
+      } catch (supabaseError: any) {
+        // Si l'erreur indique que Supabase n'est pas configuré, essayer le mode démo
+        if (supabaseError.message?.includes('Mode démo activé')) {
+          // Mode démo - vérifier les comptes de test
+          if (email === 'admin@elaiastudio.ch' && password === 'admin123') {
+            const demoUser = DEMO_USERS['admin@elaiastudio.ch'];
+            set({ 
+              user: demoUser as User, 
+              isAuthenticated: true,
+              isLoading: false 
+            });
+            customToast.success('Connexion réussie (mode démo)');
+            return;
+          }
+          
+          if (email === 'marie.dupont@email.com' && password === 'client123') {
+            const demoUser = DEMO_USERS['marie.dupont@email.com'];
+            set({ 
+              user: demoUser as User, 
+              isAuthenticated: true,
+              isLoading: false 
+            });
+            customToast.success('Connexion réussie (mode démo)');
+            return;
+          }
+          
+          throw new Error('Email ou mot de passe incorrect');
+        }
+        
+        // Si c'est une autre erreur Supabase, la propager
+        throw supabaseError;
       }
     } catch (error: any) {
       set({ isLoading: false });
+      customToast.error(error.message || 'Erreur de connexion');
       throw error;
     }
   },
@@ -121,26 +128,63 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (userData: any) => {
     set({ isLoading: true });
     try {
-      // Mode démo - créer un utilisateur fictif
-      const demoUser = {
-        id: `demo-${Date.now()}`,
-        email: userData.email,
-        first_name: userData.first_name,
-        last_name: userData.last_name,
-        phone: userData.phone,
-        role: 'client',
-        credits: 0,
-      };
-      
-      set({ 
-        user: demoUser as User, 
-        isAuthenticated: true,
-        isLoading: false 
-      });
-      
-      customToast.success('Inscription réussie (mode démo)');
-    } catch (error) {
+      // Essayer avec Supabase
+      try {
+        const { user } = await supabaseAuth.signUp(
+          userData.email,
+          userData.password,
+          {
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            phone: userData.phone,
+            role: 'client',
+            credits: 0,
+          }
+        );
+        
+        if (user) {
+          set({ 
+            user: {
+              id: user.id,
+              email: user.email!,
+              first_name: userData.first_name,
+              last_name: userData.last_name,
+              phone: userData.phone,
+              role: 'client',
+              credits: 0,
+            }, 
+            isAuthenticated: true,
+            isLoading: false 
+          });
+          customToast.success('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
+        }
+      } catch (supabaseError: any) {
+        // Si Supabase n'est pas configuré, utiliser le mode démo
+        if (supabaseError.message?.includes('Mode démo activé')) {
+          const demoUser = {
+            id: `demo-${Date.now()}`,
+            email: userData.email,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            phone: userData.phone,
+            role: 'client',
+            credits: 0,
+          };
+          
+          set({ 
+            user: demoUser as User, 
+            isAuthenticated: true,
+            isLoading: false 
+          });
+          
+          customToast.success('Inscription réussie (mode démo)');
+        } else {
+          throw supabaseError;
+        }
+      }
+    } catch (error: any) {
       set({ isLoading: false });
+      customToast.error(error.message || 'Erreur lors de l\'inscription');
       throw error;
     }
   },
