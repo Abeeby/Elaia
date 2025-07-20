@@ -7,13 +7,35 @@ import { creditService } from '../services/api';
 export default function PricingPage() {
   const [selectedTab, setSelectedTab] = useState<'decouverte' | 'credits' | 'abonnements'>('decouverte');
   
-  const { data: plans, isLoading } = useQuery({
+  const { data: plansData, isLoading, error } = useQuery({
     queryKey: ['subscription-plans'],
     queryFn: creditService.getPlans,
+    retry: 1,
   });
 
-  const creditPlans = plans?.filter((plan: any) => plan.type === 'credits') || [];
-  const monthlyPlans = plans?.filter((plan: any) => plan.type === 'monthly') || [];
+  // Default plans if API fails
+  const defaultCreditPlans = [
+    { id: 1, name: '10 Crédits', price: 250, credits: 10, type: 'credits' },
+    { id: 2, name: '20 Crédits', price: 450, credits: 20, type: 'credits' },
+    { id: 3, name: '50 Crédits', price: 1000, credits: 50, type: 'credits' },
+  ];
+
+  const defaultMonthlyPlans = [
+    { id: 4, name: 'Essentiel', price: 180, credits_per_month: 8, type: 'monthly' },
+    { id: 5, name: 'Premium', price: 350, credits_per_month: 16, type: 'monthly' },
+    { id: 6, name: 'Illimité', price: 500, unlimited: true, type: 'monthly' },
+  ];
+
+  // Ensure plans is always an array
+  const plans = Array.isArray(plansData) ? plansData : plansData?.plans || [];
+  
+  const creditPlans = plans.filter((plan: any) => plan.type === 'credits').length > 0 
+    ? plans.filter((plan: any) => plan.type === 'credits')
+    : defaultCreditPlans;
+    
+  const monthlyPlans = plans.filter((plan: any) => plan.type === 'monthly').length > 0
+    ? plans.filter((plan: any) => plan.type === 'monthly')
+    : defaultMonthlyPlans;
 
   return (
     <div className="min-h-screen bg-elaia-cream">
