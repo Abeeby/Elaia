@@ -1,23 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import './index.css'
 import App from './App.tsx'
+import './index.css'
 
-// Enregistrement du Service Worker pour PWA - Désactivé temporairement
-// if ('serviceWorker' in navigator) {
-//   window.addEventListener('load', () => {
-//     navigator.serviceWorker.register('/serviceWorker.js')
-//       .then(registration => {
-//         console.log('Service Worker enregistré avec succès:', registration);
-//       })
-//       .catch(error => {
-//         console.log('Erreur lors de l\'enregistrement du Service Worker:', error);
-//       });
-//   });
-// }
+console.log('Main.tsx loading - debug mode');
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+// Vérifier que le DOM est prêt
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  console.error('Root element not found!');
+} else {
+  console.log('Root element found, rendering app...');
+  
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+}
