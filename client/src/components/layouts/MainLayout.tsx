@@ -1,289 +1,317 @@
-import React from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Menu, X, User, Calendar, CreditCard, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Menu, X, User, LogOut, Calendar, CreditCard, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import NotificationSystem from '../NotificationSystem';
 import customToast from '../../utils/toast';
 
 export default function MainLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     customToast.success('Déconnexion réussie');
-    navigate('/');
   };
 
   const navigation = [
     { name: 'Accueil', href: '/' },
+    { name: 'Cours', href: '/courses' },
     { name: 'Planning', href: '/schedule' },
     { name: 'Tarifs', href: '/pricing' },
     { name: 'À propos', href: '/about' },
     { name: 'Contact', href: '/contact' },
   ];
 
-  const userNavigation = [
-    { name: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Mes réservations', href: '/bookings', icon: Calendar },
-    { name: 'Mon abonnement', href: '/subscription', icon: CreditCard },
-    { name: 'Mon profil', href: '/profile', icon: User },
-  ];
+  const isActive = (path: string) => location.pathname === path;
+  const showBanner = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-elaia-cream">
+    <div className="min-h-screen bg-elaia-beige">
+      <NotificationSystem />
+      
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-elaia-white shadow-sm' : 'bg-transparent'
-      }`}>
-        <nav className="container-custom">
-          <div className="flex h-20 justify-between items-center">
+      <header className={`bg-elaia-white shadow-sm sticky ${showBanner ? 'top-[40px]' : 'top-0'} z-40 transition-all`}>
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-20">
+            <div className="flex items-center">
               {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-playfair font-bold text-elaia-charcoal">ELAÏA</span>
-              <span className="text-xs font-inter uppercase tracking-[0.2em] text-elaia-warm-gray">STUDIO</span>
+              <Link to="/" className="flex items-center space-x-2">
+                <span className="text-2xl font-playfair text-elaia-charcoal">ELAÏA</span>
+                <span className="hidden sm:block text-xs font-inter uppercase tracking-[0.2em] text-elaia-warm-gray">STUDIO</span>
               </Link>
 
-            {/* Navigation desktop */}
-            <div className="hidden lg:flex items-center space-x-10">
+              {/* Desktop Navigation */}
+              <div className="hidden md:ml-10 md:flex md:space-x-8">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     to={item.href}
-                  className="text-sm font-inter font-medium text-elaia-charcoal hover-underline uppercase tracking-wider transition-colors hover:text-ohemia-accent"
+                    className={`inline-flex items-center px-1 pt-1 text-sm font-inter uppercase tracking-wider transition-colors ${
+                      isActive(item.href)
+                        ? 'text-elaia-charcoal border-b-2 border-ohemia-accent'
+                        : 'text-elaia-warm-gray hover:text-elaia-charcoal'
+                    }`}
                   >
                     {item.name}
                   </Link>
                 ))}
+              </div>
+            </div>
 
-              {/* User menu */}
-              {isAuthenticated ? (
-                <div className="relative group ml-8">
-                  <button className="flex items-center space-x-2 text-sm font-inter font-medium text-elaia-charcoal uppercase tracking-wider">
-                    <span>{user?.first_name}</span>
-                    <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
-                      </button>
-                      
-                  {/* Dropdown */}
-                  <div className="absolute right-0 mt-4 w-64 bg-elaia-white shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top scale-95 group-hover:scale-100">
-                    <div className="py-4">
-                        {user?.role === 'admin' && (
-                          <>
-                            <Link
-                              to="/admin"
-                            className="flex items-center px-6 py-3 text-sm text-elaia-charcoal hover:bg-elaia-light-gray transition-colors"
-                            >
-                              <LayoutDashboard className="mr-3 h-4 w-4" />
-                              Administration
-                            </Link>
-                          <div className="h-px bg-elaia-muted mx-6 my-2" />
-                          </>
-                        )}
-                        {userNavigation.map((item) => (
-                          <Link
-                            key={item.name}
-                            to={item.href}
-                          className="flex items-center px-6 py-3 text-sm text-elaia-charcoal hover:bg-elaia-light-gray transition-colors"
-                          >
-                            <item.icon className="mr-3 h-4 w-4" />
-                            {item.name}
-                          </Link>
-                        ))}
-                      <div className="h-px bg-elaia-muted mx-6 my-2" />
-                        <button
-                          onClick={handleLogout}
-                        className="flex w-full items-center px-6 py-3 text-sm text-elaia-charcoal hover:bg-elaia-light-gray transition-colors"
-                        >
-                          <LogOut className="mr-3 h-4 w-4" />
-                          Déconnexion
-                        </button>
+            {/* Right side */}
+            <div className="hidden md:flex items-center space-x-4">
+              {isAuthenticated && user ? (
+                <div className="flex items-center space-x-4">
+                  {/* Quick Links */}
+                  {user.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      className="p-2 text-elaia-warm-gray hover:text-elaia-charcoal transition-colors"
+                      title="Administration"
+                    >
+                      <LayoutDashboard className="h-5 w-5" />
+                    </Link>
+                  )}
+                  <Link
+                    to="/dashboard"
+                    className="p-2 text-elaia-warm-gray hover:text-elaia-charcoal transition-colors"
+                    title="Tableau de bord"
+                  >
+                    <Calendar className="h-5 w-5" />
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="p-2 text-elaia-warm-gray hover:text-elaia-charcoal transition-colors"
+                    title="Profil"
+                  >
+                    <User className="h-5 w-5" />
+                  </Link>
+                  
+                  {/* User info */}
+                  <div className="flex items-center space-x-3 pl-4 border-l border-elaia-muted">
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-elaia-charcoal">
+                        {user.first_name} {user.last_name}
+                      </p>
+                      <p className="text-xs text-elaia-warm-gray">
+                        {user.credits || 0} crédits
+                      </p>
                     </div>
+                    <button
+                      onClick={handleLogout}
+                      className="p-2 text-elaia-warm-gray hover:text-elaia-charcoal transition-colors"
+                      title="Déconnexion"
+                    >
+                      <LogOut className="h-5 w-5" />
+                    </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center space-x-6 ml-8">
-                  <Link 
-                    to="/login" 
-                    className="text-sm font-inter font-medium text-elaia-charcoal hover-underline uppercase tracking-wider"
-                  >
-                    Connexion
-                  </Link>
-                  <Link 
-                    to="/register" 
-                    className="btn-primary text-xs"
-                  >
-                    Commencer
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Menu mobile */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-elaia-charcoal"
-              >
-                {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-                ) : (
-                <Menu className="h-6 w-6" />
-                )}
-              </button>
-          </div>
-        </nav>
-
-        {/* Menu mobile panneau */}
-        <div className={`lg:hidden fixed inset-0 bg-elaia-white z-40 transform transition-transform duration-300 ${
-          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}>
-          <div className="p-6 pt-20">
-            <div className="space-y-6">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="block text-2xl font-playfair text-elaia-charcoal hover:text-ohemia-accent transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              
-              <div className="h-px bg-elaia-muted my-8" />
-              
-            {isAuthenticated ? (
-                <>
-                  <div className="space-y-4">
-                  {userNavigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                        className="block text-lg font-inter text-elaia-warm-gray hover:text-elaia-charcoal"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                  </div>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="mt-6 text-lg font-inter text-elaia-warm-gray hover:text-elaia-charcoal"
-                  >
-                    Déconnexion
-                  </button>
-                </>
-            ) : (
-                <div className="space-y-4">
+                <div className="flex items-center space-x-4">
                   <Link
                     to="/login"
-                    className="block text-lg font-inter text-elaia-warm-gray hover:text-elaia-charcoal"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-sm font-inter uppercase tracking-wider text-elaia-charcoal hover:text-ohemia-accent transition-colors"
                   >
                     Connexion
                   </Link>
                   <Link
                     to="/register"
-                    className="block btn-primary text-center"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-6 py-2 bg-elaia-charcoal text-white text-sm font-inter uppercase tracking-wider hover:bg-elaia-charcoal/90 transition-colors"
                   >
-                    Commencer
+                    S'inscrire
                   </Link>
                 </div>
               )}
-              </div>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="flex items-center md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 rounded-md text-elaia-warm-gray hover:text-elaia-charcoal transition-colors"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </button>
+            </div>
           </div>
-        </div>
+        </nav>
+
+        {/* Mobile menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-elaia-white border-t border-elaia-muted">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 text-base font-medium ${
+                    isActive(item.href)
+                      ? 'text-elaia-charcoal bg-elaia-light-gray'
+                      : 'text-elaia-warm-gray hover:text-elaia-charcoal hover:bg-elaia-light-gray'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+            
+            {/* Mobile auth section */}
+            <div className="border-t border-elaia-muted px-4 py-4">
+              {isAuthenticated && user ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-elaia-charcoal">
+                        {user.first_name} {user.last_name}
+                      </p>
+                      <p className="text-xs text-elaia-warm-gray">
+                        {user.credits || 0} crédits
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {user.role === 'admin' && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block px-3 py-2 text-sm text-elaia-warm-gray hover:text-elaia-charcoal"
+                      >
+                        Administration
+                      </Link>
+                    )}
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 text-sm text-elaia-warm-gray hover:text-elaia-charcoal"
+                    >
+                      Tableau de bord
+                    </Link>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-3 py-2 text-sm text-elaia-warm-gray hover:text-elaia-charcoal"
+                    >
+                      Mon profil
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-3 py-2 text-sm text-elaia-warm-gray hover:text-elaia-charcoal"
+                    >
+                      Déconnexion
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-center text-sm font-medium text-elaia-charcoal hover:text-ohemia-accent"
+                  >
+                    Connexion
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-center bg-elaia-charcoal text-white text-sm font-medium hover:bg-elaia-charcoal/90"
+                  >
+                    S'inscrire
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* Spacer pour le header fixe */}
-      <div className="h-20"></div>
-
-      {/* Contenu principal */}
+      {/* Main content */}
       <main>
         <Outlet />
       </main>
 
-      {/* Footer moderne */}
-      <footer className="bg-elaia-charcoal text-elaia-white">
-        <div className="container-custom py-20">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            {/* Logo et description */}
-            <div className="md:col-span-2">
-              <div className="mb-6">
-                <span className="text-3xl font-playfair">ELAÏA</span>
-                <span className="ml-2 text-xs font-inter uppercase tracking-[0.2em] text-elaia-sand">STUDIO</span>
-              </div>
-              <p className="text-elaia-muted font-light leading-relaxed max-w-md">
-                Un espace unique dédié à votre bien-être et à votre transformation physique. 
-                Découvrez le Pilates Reformer dans notre studio à Gland.
+      {/* Footer */}
+      <footer className="bg-elaia-charcoal text-elaia-white mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Brand */}
+            <div className="space-y-4">
+              <h3 className="text-2xl font-playfair">ELAÏA</h3>
+              <p className="text-sm text-elaia-white/80">
+                Votre studio de Pilates et Yoga à Gland, pour une transformation holistique du corps et de l'esprit.
               </p>
             </div>
 
-            {/* Navigation rapide */}
+            {/* Quick Links */}
             <div>
-              <h3 className="text-sm font-inter uppercase tracking-wider mb-6 text-elaia-sand">Navigation</h3>
-              <div className="space-y-3">
+              <h4 className="text-sm font-inter uppercase tracking-wider mb-4">Navigation</h4>
+              <ul className="space-y-2">
                 {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className="block text-sm text-elaia-muted hover:text-elaia-white transition-colors"
-                  >
-                    {item.name}
-                  </Link>
+                  <li key={item.name}>
+                    <Link
+                      to={item.href}
+                      className="text-sm text-elaia-white/80 hover:text-white transition-colors"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
                 ))}
-              </div>
+              </ul>
+            </div>
+
+            {/* Services */}
+            <div>
+              <h4 className="text-sm font-inter uppercase tracking-wider mb-4">Services</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/courses" className="text-sm text-elaia-white/80 hover:text-white transition-colors">
+                    Cours collectifs
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/pricing" className="text-sm text-elaia-white/80 hover:text-white transition-colors">
+                    Abonnements
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/schedule" className="text-sm text-elaia-white/80 hover:text-white transition-colors">
+                    Planning
+                  </Link>
+                </li>
+              </ul>
             </div>
 
             {/* Contact */}
             <div>
-              <h3 className="text-sm font-inter uppercase tracking-wider mb-6 text-elaia-sand">Contact</h3>
-              <div className="space-y-3 text-sm text-elaia-muted">
-                <p>
-                  <a href="mailto:contact@elaia-studio.ch" className="hover:text-elaia-white transition-colors">
-                    contact@elaia-studio.ch
+              <h4 className="text-sm font-inter uppercase tracking-wider mb-4">Contact</h4>
+              <ul className="space-y-2 text-sm text-elaia-white/80">
+                <li>Rue de la Gare 15</li>
+                <li>1196 Gland, Suisse</li>
+                <li className="pt-2">
+                  <a href="tel:+41791234567" className="hover:text-white transition-colors">
+                    +41 79 123 45 67
                   </a>
-                </p>
-                <p>
-                  <a href="tel:+41797181009" className="hover:text-elaia-white transition-colors">
-                    079 718 10 09
+                </li>
+                <li>
+                  <a href="mailto:contact@elaiastudio.ch" className="hover:text-white transition-colors">
+                    contact@elaiastudio.ch
                   </a>
-                </p>
-                <p className="pt-4">
-                  Langues : FR • EN • ES • AL
-                </p>
-              </div>
+                </li>
+              </ul>
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div className="mt-16 pt-8 border-t border-elaia-warm-gray">
-            <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-              <p className="text-sm text-elaia-muted">
-                © 2025 Elaïa Studio. Tous droits réservés.
-              </p>
-              <div className="flex space-x-6 text-sm text-elaia-muted">
-                <Link to="/legal" className="hover:text-elaia-white transition-colors">
-                  Mentions légales
-                </Link>
-                <Link to="/faq" className="hover:text-elaia-white transition-colors">
-                  FAQ
-                </Link>
-              </div>
-            </div>
+          <div className="mt-12 pt-8 border-t border-elaia-white/20 text-center text-sm text-elaia-white/60">
+            <p>&copy; 2024 ELAÏA Studio. Tous droits réservés.</p>
           </div>
         </div>
       </footer>

@@ -1,402 +1,309 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronDown, Star, Users, Heart, Award, Clock, Play } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
-import { useNotifications } from '../components/NotificationSystem';
-import { gsap } from 'gsap';
+import { ArrowRight, ChevronDown, Menu, X } from 'lucide-react';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function HomePage() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState('reformer');
-  const logoRef = useRef(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const notifications = useNotifications();
+  const logoRef = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion || !logoRef.current) return;
 
-    const mm = gsap.matchMedia();
-
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        }
-      });
-
-      tl.fromTo(logoRef.current,
-        { scale: 1, y: 0, x: 0, opacity: 1 },
-        { 
-          scale: 0.06, 
-          y: "-47vh", 
-          x: "-42vw", 
-          opacity: 1, // Changez à 0 si vous voulez qu'il disparaisse
-          ease: "power2.out" 
-        }
-      );
-
-      ScrollTrigger.create({
+    const logo = logoRef.current;
+    const tl = gsap.timeline({
+      scrollTrigger: {
         trigger: heroRef.current,
-        start: "bottom top",
-        onLeave: () => {
-          gsap.set(logoRef.current, { 
-            position: 'fixed', 
-            top: '10px', 
-            left: '20px', 
-            transform: 'scale(0.06)', 
-            zIndex: 1100 
-          });
-        },
-        onEnterBack: () => {
-          gsap.set(logoRef.current, { 
-            position: 'absolute', 
-            top: '50%', 
-            left: '50%', 
-            transform: 'translate(-50%, -50%) scale(0.06)',
-            zIndex: 'auto'
-          });
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+      }
+    });
+
+    // Animation du logo en plusieurs étapes comme Ohemia
+    tl.to(logo, {
+      scale: 0.3,
+      y: -window.innerHeight * 0.35,
+      x: -window.innerWidth * 0.35,
+      duration: 1,
+      ease: 'power2.inOut'
+    })
+    .to(logo.querySelector('.logo-text'), {
+      opacity: 0,
+      duration: 0.3
+    }, '<0.5')
+    .to(logo, {
+      opacity: 0,
+      duration: 0.3
+    }, '>');
+
+    // Parallax effect for images
+    const images = document.querySelectorAll('.parallax-image');
+    images.forEach((img) => {
+      gsap.to(img, {
+        yPercent: -20,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: img,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
         }
       });
     });
 
-    setIsVisible(true);
-    
-    // Notification élégante après quelques secondes
-    const welcomeTimer = setTimeout(() => {
-      notifications.showSuccess(
-        "Offre de lancement disponible",
-        "Profitez de notre offre Welcome : 1 séance achetée + 1 offerte",
-        {
-          label: "Découvrir",
-          onClick: () => document.getElementById('intro-section')?.scrollIntoView({ behavior: 'smooth' })
-        }
-      );
-    }, 5000);
-
-    return () => clearTimeout(welcomeTimer);
-  }, [notifications]);
-
-  const courses = {
-    reformer: {
-      title: 'Reformer',
-      subtitle: 'Force • Alignement • Contrôle',
-      description: 'Transformez votre corps avec notre équipement de pointe. Le Reformer permet un travail en profondeur avec une résistance ajustable pour tous les niveaux.',
-      intensity: 'Modérée à intense'
-    },
-    pilates: {
-      title: 'Pilates',
-      subtitle: 'Centre • Fluidité • Précision',
-      description: 'Développez votre force profonde et améliorez votre posture. Nos cours de Pilates classique sont conçus pour renforcer et équilibrer votre corps.',
-      intensity: 'Douce à modérée'
-    },
-    yoga: {
-      title: 'Yoga',
-      subtitle: 'Respiration • Souplesse • Sérénité',
-      description: 'Trouvez votre équilibre intérieur. Nos séances de yoga allient mouvement conscient et respiration pour une harmonie corps-esprit.',
-      intensity: 'Douce'
-    }
-  };
-
-  const instructors = [
-    {
-      name: 'Albina',
-      role: 'Fondatrice & Instructrice principale',
-      specialty: 'Maîtrise fédérale Pilates',
-      image: '/instructor-1.jpg'
-    },
-    {
-      name: 'Sarah',
-      role: 'Instructrice Pilates',
-      specialty: 'Spécialiste Reformer',
-      image: '/instructor-2.jpg'
-    },
-    {
-      name: 'Marie',
-      role: 'Instructrice Yoga',
-      specialty: 'Vinyasa & Yin Yoga',
-      image: '/instructor-3.jpg'
-    }
-  ];
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, []);
 
   return (
-    <div className="bg-elaia-cream">
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative h-screen flex items-center justify-center bg-white overflow-hidden" id="hero">
-        <img 
+    <>
+      {/* Bandeau promo */}
+      <div className="bg-elaia-charcoal text-white py-2 text-center text-sm">
+        <p>🎉 Offre spéciale : -20% sur tous les abonnements jusqu'au 31 janvier</p>
+      </div>
+
+      {/* Hero Section avec animation logo */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-elaia-cream">
+        <div 
           ref={logoRef}
-          src="/elaia-logo.svg"
-          alt="Elaia Logo"
-          className="w-[70vw] max-w-[950px] h-auto"
-          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+          className="absolute inset-0 flex flex-col items-center justify-center z-10"
+        >
+          <h1 className="text-[15vw] md:text-[12vw] font-playfair text-elaia-charcoal tracking-[0.2em] leading-none">
+            ELAÏA
+          </h1>
+          <div className="logo-text mt-8 text-center">
+            <p className="text-sm md:text-base font-inter uppercase tracking-[0.3em] text-elaia-warm-gray mb-4">
+              L'union parfaite de
+            </p>
+            <h2 className="text-2xl md:text-4xl font-playfair text-elaia-charcoal">
+              YOGA MODERNE ET PILATES
+            </h2>
+            <Link 
+              to="/register" 
+              className="inline-block mt-12 px-8 py-4 bg-transparent border border-elaia-charcoal text-elaia-charcoal hover:bg-elaia-charcoal hover:text-white transition-all duration-300 text-sm font-inter uppercase tracking-[0.2em]"
+            >
+              RÉSERVEZ MAINTENANT
+            </Link>
+          </div>
+        </div>
+
+        {/* Background image */}
+        <img 
+          src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=1920"
+          alt="Yoga pose"
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
-      </section>
 
-      {/* Section Pourquoi Elaïa Studio */}
-      <section id="intro-section" className="section-padding bg-elaia-cream">
-        <div className="container-custom max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-elaia-warm-gray text-sm uppercase tracking-wider mb-4">
-              Pourquoi Elaïa Studio ?
-            </p>
-            <h2 className="heading-lg text-elaia-charcoal mb-8">
-              Une ambiance qui transforme
-            </h2>
-            <p className="body-lg text-elaia-warm-gray max-w-4xl mx-auto leading-relaxed">
-              Chaque séance est un voyage. Une parenthèse hors du temps pour rétablir l'équilibre entre corps et esprit, 
-              dans un cadre lumineux, feutré, où l'on se sent instantanément à sa place. Ici, le silence devient un allié, 
-              et chaque mouvement compte.
-            </p>
-          </div>
-
-          {/* Valeurs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-            <div className="text-center">
-              <div className="text-4xl mb-4">🌿</div>
-              <h3 className="font-semibold text-elaia-charcoal mb-3">Bien-être durable</h3>
-              <p className="text-sm text-elaia-warm-gray leading-relaxed">
-                Nos pratiques renforcent la posture, soulagent les tensions et amènent une fluidité nouvelle dans le corps.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl mb-4">🔥</div>
-              <h3 className="font-semibold text-elaia-charcoal mb-3">Respiration & conscience</h3>
-              <p className="text-sm text-elaia-warm-gray leading-relaxed">
-                Connectez-vous à l'instant. Les mouvements sont guidés par la respiration, pour un retour à soi naturel.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl mb-4">💪</div>
-              <h3 className="font-semibold text-elaia-charcoal mb-3">Force intérieure</h3>
-              <p className="text-sm text-elaia-warm-gray leading-relaxed">
-                Renforcement profond, amélioration de l'endurance musculaire et sentiment de contrôle retrouvé.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl mb-4">🛡️</div>
-              <h3 className="font-semibold text-elaia-charcoal mb-3">Sécurité & bienveillance</h3>
-              <p className="text-sm text-elaia-warm-gray leading-relaxed">
-                Aucun niveau requis. Nos coachs certifiés adaptent chaque mouvement à votre réalité du jour.
-              </p>
-            </div>
-          </div>
-
-          {/* Citation */}
-          <div className="text-center">
-            <p className="text-xl italic text-elaia-warm-gray font-lora">
-              "On vient chez Elaïa pour se tonifier... mais on y revient pour s'y retrouver."
-            </p>
-          </div>
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <ChevronDown className="h-8 w-8 text-elaia-charcoal" />
         </div>
       </section>
 
-      {/* Section Classes - Style moderne */}
-      <section className="bg-elaia-charcoal">
-        <div className="grid grid-cols-1 md:grid-cols-3">
-          {/* Yoga */}
-          <div className="relative group overflow-hidden">
-            <div className="aspect-[4/5] relative">
-              <img 
-                src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80&fit=crop&crop=entropy"
-                alt="Yoga"
-                className="w-full h-full object-cover grayscale"
-              />
-              <div className="absolute inset-0 bg-black/40"></div>
-              <div className="absolute inset-0 flex flex-col justify-end p-12">
-                <p className="text-white/70 text-xs font-inter uppercase tracking-[0.2em] mb-3">COURS</p>
-                <h3 className="text-white text-3xl font-playfair mb-6">YOGA</h3>
-                <p className="text-white/80 text-sm leading-relaxed mb-8 max-w-sm">
-                  Puisez dans votre force intérieure pour une nouvelle conscience du corps et de l'esprit. 
-                  Trouvez votre équilibre et votre sérénité.
-                </p>
-                <Link to="/schedule" className="inline-flex items-center text-white text-xs font-inter uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">
-                  RÉSERVER MAINTENANT
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Reformer */}
-          <div className="relative group overflow-hidden">
-            <div className="aspect-[4/5] relative">
-              <img 
-                src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80&fit=crop&crop=entropy"
-                alt="Reformer"
-                className="w-full h-full object-cover grayscale"
-              />
-              <div className="absolute inset-0 bg-black/40"></div>
-              <div className="absolute inset-0 flex flex-col justify-end p-12">
-                <p className="text-white/70 text-xs font-inter uppercase tracking-[0.2em] mb-3">COURS</p>
-                <h3 className="text-white text-3xl font-playfair mb-6">REFORMER</h3>
-                <p className="text-white/80 text-sm leading-relaxed mb-8 max-w-sm">
-                  Vivez un entraînement dynamique complet. Activez votre centre 
-                  et développez force et flexibilité en profondeur.
-                </p>
-                <Link to="/schedule" className="inline-flex items-center text-white text-xs font-inter uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">
-                  RÉSERVER MAINTENANT
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Pilates */}
-          <div className="relative group overflow-hidden">
-            <div className="aspect-[4/5] relative">
-              <img 
-                src="https://images.unsplash.com/photo-1599901860146-d62f2ebdb5d4?w=800&q=80&fit=crop&crop=entropy"
-                alt="Pilates"
-                className="w-full h-full object-cover grayscale"
-              />
-              <div className="absolute inset-0 bg-black/40"></div>
-              <div className="absolute inset-0 flex flex-col justify-end p-12">
-                <p className="text-white/70 text-xs font-inter uppercase tracking-[0.2em] mb-3">COURS</p>
-                <h3 className="text-white text-3xl font-playfair mb-6">PILATES</h3>
-                <p className="text-white/80 text-sm leading-relaxed mb-8 max-w-sm">
-                  Révélez votre potentiel et ressentez la différence. 
-                  Atteignez votre meilleure forme avec un maximum d'efficacité.
-                </p>
-                <Link to="/schedule" className="inline-flex items-center text-white text-xs font-inter uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">
-                  RÉSERVER MAINTENANT
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section Cours Sélecteur */}
-      <section className="section-padding bg-elaia-light-gray">
-        <div className="container-custom">
-          <div className="text-center mb-16">
-            <h2 className="heading-lg text-elaia-charcoal mb-4">
-              Choose your journey
-            </h2>
-            <p className="body-lg text-elaia-warm-gray max-w-2xl mx-auto">
-              Trois approches complémentaires pour révéler votre potentiel
-            </p>
-          </div>
-          
-          {/* Sélecteur de cours */}
-          <div className="flex justify-center mb-12">
-            <div className="inline-flex border-b-2 border-elaia-muted">
-              {Object.keys(courses).map((key) => (
-                <button
-                  key={key}
-                  onClick={() => setSelectedCourse(key)}
-                  className={`px-8 py-4 text-sm font-inter uppercase tracking-wider transition-all ${
-                    selectedCourse === key
-                      ? 'text-elaia-charcoal border-b-2 border-elaia-charcoal -mb-[2px]'
-                      : 'text-elaia-warm-gray hover:text-elaia-charcoal'
-                  }`}
-                >
-                  {courses[key as keyof typeof courses].title}
-                </button>
-              ))}
-            </div>
-            </div>
-            
-          {/* Contenu du cours sélectionné */}
+      {/* Transformation Section avec images parallax */}
+      <section className="relative py-24 bg-elaia-cream overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="order-2 lg:order-1">
-              <img 
-                src={`https://images.unsplash.com/photo-${
-                  selectedCourse === 'reformer' ? '1599901860146-d62f2ebdb5d4' :
-                  selectedCourse === 'pilates' ? '1518611012118-696072aa579a' :
-                  '1506126613715-e00b0af6e0a8'
-                }?w=800`}
-                alt={courses[selectedCourse as keyof typeof courses].title}
-                className="w-full h-[500px] object-cover"
-              />
-            </div>
-            <div className="order-1 lg:order-2">
-              <h3 className="heading-md text-elaia-charcoal mb-4">
-                {courses[selectedCourse as keyof typeof courses].title}
-              </h3>
-              <p className="text-lg font-lora italic text-ohemia-accent mb-6">
-                {courses[selectedCourse as keyof typeof courses].subtitle}
-              </p>
-              <p className="body-lg text-elaia-warm-gray mb-8">
-                {courses[selectedCourse as keyof typeof courses].description}
-              </p>
-              <div className="mb-8">
-                <span className="text-sm font-inter uppercase tracking-wider text-elaia-warm-gray">
-                  Intensité : 
-                </span>
-                <span className="text-sm font-inter uppercase tracking-wider text-elaia-charcoal ml-2">
-                  {courses[selectedCourse as keyof typeof courses].intensity}
-                </span>
+            {/* Images avec effet parallax */}
+            <div className="relative h-[600px]">
+              <div className="absolute left-0 top-0 w-[60%] h-[70%] overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800"
+                  alt="Mouvement fluide"
+                  className="parallax-image w-full h-[120%] object-cover"
+                />
               </div>
-              <Link to="/schedule" className="btn-accent">
-                Explorer ce cours
-              </Link>
+              <div className="absolute right-0 bottom-0 w-[60%] h-[70%] overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800"
+                  alt="Yoga aérien"
+                  className="parallax-image w-full h-[120%] object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Contenu */}
+            <div className="space-y-8">
+              <h2 className="text-4xl md:text-5xl font-playfair text-elaia-charcoal leading-tight">
+                TRANSFORMATION DE L'EXPÉRIENCE
+              </h2>
+              <p className="text-lg text-elaia-warm-gray leading-relaxed">
+                Plongez dans. Faites l'expérience d'un nouveau sentiment. Ceux qui sont en équilibre le rayonnent. Par la posture, la présence et l'énergie. ELAÏA vous offre un espace pour la force holistique et, bien sûr, le charisme authentique.
+              </p>
+              <div className="flex gap-8">
+                <Link 
+                  to="/courses" 
+                  className="text-sm font-inter uppercase tracking-[0.2em] text-elaia-charcoal border-b border-elaia-charcoal hover:border-ohemia-accent hover:text-ohemia-accent transition-colors"
+                >
+                  COURS
+                </Link>
+                <Link 
+                  to="/schedule" 
+                  className="text-sm font-inter uppercase tracking-[0.2em] text-elaia-charcoal border-b border-elaia-charcoal hover:border-ohemia-accent hover:text-ohemia-accent transition-colors"
+                >
+                  ÉVÉNEMENTS
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section Instructeurs */}
-      <section className="section-padding bg-elaia-white">
-        <div className="container-custom">
-          <div className="text-center mb-16">
-            <h2 className="heading-lg text-elaia-charcoal mb-4">
-              Meet your instructors
-            </h2>
-            <p className="body-lg text-elaia-warm-gray max-w-2xl mx-auto">
-              Une équipe passionnée et certifiée pour vous accompagner dans votre transformation
-            </p>
+      {/* Nos Valeurs */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+            {[
+              { title: 'ÉQUILIBRE', desc: 'Corps et esprit en harmonie' },
+              { title: 'FORCE', desc: 'Puissance intérieure révélée' },
+              { title: 'FLEXIBILITÉ', desc: 'Souplesse du mouvement' },
+              { title: 'SÉRÉNITÉ', desc: 'Paix profonde cultivée' }
+            ].map((value, index) => (
+              <div key={index} className="text-center">
+                <h3 className="text-lg font-playfair text-elaia-charcoal mb-2">{value.title}</h3>
+                <p className="text-sm text-elaia-warm-gray">{value.desc}</p>
+              </div>
+            ))}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {instructors.map((instructor, index) => (
-              <div key={index} className="text-center group">
-                <div className="relative mb-6 overflow-hidden">
+          <div className="text-center max-w-3xl mx-auto">
+            <blockquote className="text-2xl md:text-3xl font-playfair text-elaia-charcoal italic">
+              "Le yoga ne change pas seulement la façon dont nous voyons les choses, il transforme la personne qui voit."
+            </blockquote>
+            <cite className="block mt-4 text-sm text-elaia-warm-gray font-inter uppercase tracking-wider">
+              — B.K.S. Iyengar
+            </cite>
+          </div>
+        </div>
+      </section>
+
+      {/* Nos Classes */}
+      <section className="py-24 bg-elaia-cream">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl md:text-5xl font-playfair text-elaia-charcoal text-center mb-16">
+            NOS CLASSES
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                title: 'YOGA',
+                image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800',
+                description: 'Explorez différents styles de yoga adaptés à tous les niveaux. Du Hatha doux au Vinyasa dynamique.'
+              },
+              {
+                title: 'REFORMER',
+                image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800',
+                description: 'Sculptez et renforcez votre corps avec nos séances sur machines Reformer de dernière génération.'
+              },
+              {
+                title: 'PILATES',
+                image: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800',
+                description: 'Développez votre force profonde et améliorez votre posture avec nos cours de Pilates sur tapis.'
+              }
+            ].map((item, index) => (
+              <div key={index} className="group cursor-pointer">
+                <div className="aspect-[3/4] overflow-hidden mb-6">
                   <img 
-                    src={`https://images.unsplash.com/photo-${
-                      index === 0 ? '1594381298921-9e18df7909f9' :
-                      index === 1 ? '1573496359142-b8d87734a5a2' :
-                      '1582534113276-784e6fb7c3dc'
-                    }?w=400`}
-                    alt={instructor.name}
-                    className="w-full h-96 object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105"
                   />
                 </div>
-                <h3 className="heading-sm text-elaia-charcoal mb-2">
-                  {instructor.name}
-                </h3>
-                <p className="text-sm font-inter uppercase tracking-wider text-ohemia-accent mb-2">
-                  {instructor.role}
-                </p>
-                <p className="text-sm text-elaia-warm-gray">
-                  {instructor.specialty}
-                </p>
+                <h3 className="text-2xl font-playfair text-elaia-charcoal mb-3">{item.title}</h3>
+                <p className="text-elaia-warm-gray mb-4">{item.description}</p>
+                <Link 
+                  to="/courses" 
+                  className="inline-flex items-center text-sm font-inter uppercase tracking-wider text-elaia-charcoal hover:text-ohemia-accent transition-colors"
+                >
+                  Découvrir <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Section CTA Final */}
-      <section className="section-padding bg-elaia-charcoal text-elaia-white">
-        <div className="container-custom text-center">
-          <h2 className="heading-lg mb-8">
-            Prêt à commencer votre transformation ?
-          </h2>
-          <p className="body-lg mb-12 max-w-2xl mx-auto opacity-90">
-            Rejoignez-nous dès juillet 2025 dans notre nouveau studio à Gland et 
-            découvrez une nouvelle approche du bien-être.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register" className="btn-accent">
-              Réserver maintenant
+      {/* Menu Hamburger */}
+      <button
+        onClick={() => setMenuOpen(!menuOpen)}
+        className="fixed bottom-8 right-8 z-50 bg-elaia-charcoal text-white p-4 rounded-full shadow-lg hover:bg-elaia-charcoal/90 transition-colors"
+      >
+        {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+      </button>
+
+      {/* Menu Overlay */}
+      <div className={`fixed inset-0 bg-black/95 z-40 transition-opacity duration-300 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <div className="h-full flex items-center justify-center">
+          <nav className="text-center space-y-8">
+            <Link 
+              to="/" 
+              onClick={() => setMenuOpen(false)}
+              className="block text-3xl font-playfair text-white hover:text-ohemia-accent transition-colors"
+            >
+              ACCUEIL
             </Link>
-            <Link to="/contact" className="btn-secondary border-elaia-white text-elaia-white hover:bg-elaia-white hover:text-elaia-charcoal">
-              Nous contacter
+            <Link 
+              to="/courses" 
+              onClick={() => setMenuOpen(false)}
+              className="block text-3xl font-playfair text-white hover:text-ohemia-accent transition-colors"
+            >
+              COURS
             </Link>
-          </div>
+            <Link 
+              to="/schedule" 
+              onClick={() => setMenuOpen(false)}
+              className="block text-3xl font-playfair text-white hover:text-ohemia-accent transition-colors"
+            >
+              PLANNING
+            </Link>
+            <Link 
+              to="/pricing" 
+              onClick={() => setMenuOpen(false)}
+              className="block text-3xl font-playfair text-white hover:text-ohemia-accent transition-colors"
+            >
+              TARIFS
+            </Link>
+            <Link 
+              to="/about" 
+              onClick={() => setMenuOpen(false)}
+              className="block text-3xl font-playfair text-white hover:text-ohemia-accent transition-colors"
+            >
+              À PROPOS
+            </Link>
+            <Link 
+              to="/contact" 
+              onClick={() => setMenuOpen(false)}
+              className="block text-3xl font-playfair text-white hover:text-ohemia-accent transition-colors"
+            >
+              CONTACT
+            </Link>
+            <div className="pt-8 space-y-4">
+              <Link 
+                to="/login" 
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-inter uppercase tracking-wider text-white hover:text-ohemia-accent transition-colors"
+              >
+                CONNEXION
+              </Link>
+              <Link 
+                to="/register" 
+                onClick={() => setMenuOpen(false)}
+                className="inline-block px-8 py-3 border border-white text-white hover:bg-white hover:text-black transition-all text-lg font-inter uppercase tracking-wider"
+              >
+                INSCRIPTION
+              </Link>
+            </div>
+          </nav>
         </div>
-      </section>
-    </div>
+      </div>
+    </>
   );
 } 
