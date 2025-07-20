@@ -20,16 +20,25 @@ export default function DashboardPage() {
   const navigate = useNavigate();
 
   // Récupérer les réservations à venir
-  const { data: upcomingBookings } = useQuery({
+  const { data: upcomingBookingsData } = useQuery({
     queryKey: ['upcoming-bookings'],
     queryFn: () => bookingService.getMyBookings({ timeframe: 'future' }),
   });
 
   // Récupérer l'historique récent
-  const { data: recentBookings } = useQuery({
+  const { data: recentBookingsData } = useQuery({
     queryKey: ['recent-bookings'],
     queryFn: () => bookingService.getMyBookings({ timeframe: 'past' }),
   });
+
+  // Ensure bookings are arrays
+  const upcomingBookings = Array.isArray(upcomingBookingsData) 
+    ? upcomingBookingsData 
+    : upcomingBookingsData?.bookings || [];
+  
+  const recentBookings = Array.isArray(recentBookingsData)
+    ? recentBookingsData
+    : recentBookingsData?.bookings || [];
 
   // Récupérer l'abonnement actuel
   const { data: subscriptionData } = useQuery({
@@ -38,7 +47,7 @@ export default function DashboardPage() {
   });
 
   const currentSubscription = subscriptionData?.subscription;
-  const nextBooking = upcomingBookings?.[0];
+  const nextBooking = upcomingBookings[0];
   const totalBookingsThisMonth = currentSubscription?.usage_stats?.total_bookings || 0;
 
   return (
@@ -149,7 +158,7 @@ export default function DashboardPage() {
             </div>
             <h3 className="text-sm font-medium text-gray-600 mb-2">Votre progression</h3>
             <p className="text-sm text-elaia-gray">
-              {recentBookings?.length || 0} séances complétées
+                              {recentBookings.length} séances complétées
             </p>
           </div>
         </div>
@@ -220,7 +229,7 @@ export default function DashboardPage() {
             </Link>
           </div>
           
-          {upcomingBookings && upcomingBookings.length > 0 ? (
+          {Array.isArray(upcomingBookings) && upcomingBookings.length > 0 ? (
             <div className="space-y-4">
               {upcomingBookings.slice(0, 3).map((booking: Booking) => (
                 <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
