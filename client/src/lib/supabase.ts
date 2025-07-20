@@ -1,89 +1,84 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase configuration manquante. Mode démo activé.');
-}
-
+// Créer un client Supabase même avec des valeurs par défaut
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: true,
-    autoRefreshToken: true,
+    persistSession: false, // Désactiver la persistence en mode démo
+    autoRefreshToken: false,
   }
 });
 
 // Helper functions pour l'authentification
 export const supabaseAuth = {
   async signIn(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (error) throw error;
-    
-    // Récupérer les infos utilisateur depuis la table users
-    if (data.user) {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-        
-      if (userError) throw userError;
-      
-      return {
-        user: userData,
-        session: data.session,
-      };
-    }
-    
-    return data;
+    // En mode démo, toujours retourner une erreur pour forcer l'utilisation du mode démo dans authStore
+    throw new Error('Supabase non configuré - Mode démo activé');
   },
   
   async signUp(email: string, password: string, metadata: any) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata,
-      },
-    });
-    
-    if (error) throw error;
-    return data;
+    throw new Error('Supabase non configuré - Mode démo activé');
   },
   
   async signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    // Ne rien faire en mode démo
   },
   
   async getUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (user) {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-        
-      if (error) throw error;
-      return userData;
-    }
-    
+    // Toujours retourner null en mode démo
     return null;
   },
   
   onAuthStateChange(callback: (event: any, session: any) => void) {
-    return supabase.auth.onAuthStateChange(callback);
+    // Ne rien faire en mode démo
+    return {
+      data: { subscription: { unsubscribe: () => {} } }
+    };
   },
 };
 
 // Types TypeScript pour les tables
+export interface Database {
+  public: {
+    Tables: {
+      users: {
+        Row: {
+          id: string;
+          email: string;
+          first_name: string | null;
+          last_name: string | null;
+          phone: string | null;
+          role: string;
+          created_at: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          first_name?: string | null;
+          last_name?: string | null;
+          phone?: string | null;
+          role?: string;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          first_name?: string | null;
+          last_name?: string | null;
+          phone?: string | null;
+          role?: string;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+      };
+    };
+  };
+}
+
 export interface User {
   id: string;
   email: string;
