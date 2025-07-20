@@ -26,7 +26,7 @@ export default function MainLayout() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-elaia-beige">
+    <div className="min-h-screen bg-elaia-cream">
       {/* Bandeau promo */}
       {location.pathname === '/' && (
         <div className="bg-elaia-charcoal text-white py-2 text-center text-sm fixed top-0 left-0 right-0 z-50">

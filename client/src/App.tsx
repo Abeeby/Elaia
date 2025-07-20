@@ -49,69 +49,120 @@ import SEOHead from './components/SEOHead';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
       refetchOnWindowFocus: false,
     },
   },
 });
+
+// Error Boundary pour capturer les erreurs
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Une erreur s'est produite</h1>
+            <p className="text-gray-600 mb-4">
+              {this.state.error?.message || 'Erreur inconnue'}
+            </p>
+            <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto">
+              {this.state.error?.stack}
+            </pre>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark"
+            >
+              Recharger la page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 function App() {
   const initAuth = useAuthStore((state) => state.initAuth);
 
   useEffect(() => {
     // Initialiser l'authentification au démarrage
-    initAuth();
+    try {
+      initAuth();
+    } catch (error) {
+      console.error('Error initializing auth:', error);
+    }
   }, [initAuth]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <SEOHead />
-        <Routes>
-          {/* Routes avec MainLayout */}
-          <Route path="/" element={<MainLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="courses" element={<CoursesPage />} />
-            <Route path="schedule" element={<SchedulePage />} />
-            <Route path="pricing" element={<PricingPage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="contact" element={<ContactPage />} />
-            <Route path="faq" element={<FaqPage />} />
-            <Route path="legal" element={<LegalPage />} />
-            
-            {/* Routes privées */}
-            <Route element={<PrivateRoute />}>
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="bookings" element={<BookingsPage />} />
-              <Route path="subscription" element={<SubscriptionPage />} />
-              <Route path="credit-history" element={<CreditHistoryPage />} />
-              <Route path="prospects" element={<ProspectsPage />} />
-              <Route path="trial" element={<TrialPage />} />
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <SEOHead />
+          <Routes>
+            {/* Routes avec MainLayout */}
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="courses" element={<CoursesPage />} />
+              <Route path="schedule" element={<SchedulePage />} />
+              <Route path="pricing" element={<PricingPage />} />
+              <Route path="about" element={<AboutPage />} />
+              <Route path="contact" element={<ContactPage />} />
+              <Route path="faq" element={<FaqPage />} />
+              <Route path="legal" element={<LegalPage />} />
+              
+              {/* Routes privées */}
+              <Route element={<PrivateRoute />}>
+                <Route path="dashboard" element={<DashboardPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="bookings" element={<BookingsPage />} />
+                <Route path="subscription" element={<SubscriptionPage />} />
+                <Route path="credit-history" element={<CreditHistoryPage />} />
+                <Route path="prospects" element={<ProspectsPage />} />
+                <Route path="trial" element={<TrialPage />} />
+              </Route>
+              
+              {/* Routes admin */}
+              <Route path="admin" element={<AdminRoute />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="classes" element={<AdminClasses />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="reports" element={<AdminReports />} />
+                <Route path="messages" element={<AdminMessages />} />
+              </Route>
             </Route>
             
-            {/* Routes admin */}
-            <Route path="admin" element={<AdminRoute />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="classes" element={<AdminClasses />} />
-              <Route path="users" element={<AdminUsers />} />
-              <Route path="reports" element={<AdminReports />} />
-              <Route path="messages" element={<AdminMessages />} />
+            {/* Routes avec AuthLayout */}
+            <Route element={<AuthLayout />}>
+              <Route path="login" element={<LoginPage />} />
+              <Route path="register" element={<RegisterPage />} />
             </Route>
-          </Route>
-          
-          {/* Routes avec AuthLayout */}
-          <Route element={<AuthLayout />}>
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-          </Route>
-          
-          {/* Redirection 404 */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+            
+            {/* Redirection 404 */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
