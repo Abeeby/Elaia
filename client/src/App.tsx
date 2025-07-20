@@ -42,7 +42,7 @@ import AdminMessages from './pages/admin/AdminMessages';
 // Composants
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
-// import SEOHead from './components/SEOHead'; // Causes the "add" error
+import SEOHead from './components/SEOHead';
 
 // Créer le client React Query
 const queryClient = new QueryClient({
@@ -114,7 +114,7 @@ function AppContent() {
 
   return (
     <Router>
-      {/* <SEOHead /> - Removed: causes "add" error */}
+      <SEOHead />
       <Routes>
         {/* Routes avec MainLayout */}
         <Route path="/" element={<MainLayout />}>
