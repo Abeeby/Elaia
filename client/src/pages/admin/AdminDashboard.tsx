@@ -38,18 +38,28 @@ export default function AdminDashboard() {
   });
 
   // Récupérer les réservations récentes
-  const { data: recentBookings } = useQuery({
+  const { data: recentBookingsData } = useQuery({
     queryKey: ['admin-recent-bookings'],
     queryFn: () => adminService.getBookings({ limit: 5 }),
   });
 
+  // Ensure recentBookings is an array
+  const recentBookings = Array.isArray(recentBookingsData)
+    ? recentBookingsData
+    : recentBookingsData?.bookings || [];
+
   // Récupérer les nouveaux clients
-  const { data: newClients } = useQuery({
+  const { data: newClientsData } = useQuery({
     queryKey: ['admin-new-clients'],
     queryFn: () => adminService.getClients({ 
       registered_after: format(startOfMonth(new Date()), 'yyyy-MM-dd') 
     }),
   });
+
+  // Ensure newClients is an array
+  const newClients = Array.isArray(newClientsData)
+    ? newClientsData
+    : newClientsData?.clients || [];
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-CH', {
@@ -234,7 +244,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="divide-y">
-              {recentBookings?.slice(0, 5).map((booking: any) => (
+                                {recentBookings.slice(0, 5).map((booking: any) => (
                 <div key={booking.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div>
@@ -269,7 +279,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="divide-y">
-              {newClients?.slice(0, 5).map((client: any) => (
+                                {newClients.slice(0, 5).map((client: any) => (
                 <div key={client.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
