@@ -28,15 +28,36 @@ export default function HomePage() {
       });
 
       tl.fromTo(logoRef.current,
-        { scale: 1, y: 0 },
-        { scale: 0.25, y: "calc(-50vh + 3.5rem)", ease: "power2.out" }
+        { scale: 1, y: 0, x: 0, opacity: 1 },
+        { 
+          scale: 0.15, 
+          y: "calc(-50vh + 2rem)", 
+          x: "calc(-50vw + 5rem)", 
+          opacity: 1, // Changez à 0 si vous voulez qu'il disparaisse
+          ease: "power2.out" 
+        }
       );
 
       ScrollTrigger.create({
         trigger: heroRef.current,
         start: "bottom top",
         onLeave: () => {
-          gsap.set(logoRef.current, { position: 'fixed', top: '1.75rem', left: '50%', transform: 'translateX(-50%) scale(0.25)', zIndex: 1000 });
+          gsap.set(logoRef.current, { 
+            position: 'fixed', 
+            top: '1rem', 
+            left: '2rem', 
+            transform: 'scale(0.15)', 
+            zIndex: 1000 
+          });
+        },
+        onEnterBack: () => {
+          gsap.set(logoRef.current, { 
+            position: 'absolute', 
+            top: '50%', 
+            left: '50%', 
+            transform: 'translate(-50%, -50%) scale(0.15)',
+            zIndex: 'auto'
+          });
         }
       });
     });
@@ -135,14 +156,14 @@ export default function HomePage() {
                   <div>
                     <h3 className="font-inter font-semibold text-elaia-charcoal mb-2">Excellence</h3>
                     <p className="text-elaia-warm-gray">Formation continue et équipement premium</p>
-                  </div>
+            </div>
                 </div>
                 <div className="flex items-start">
                   <div className="w-1 h-16 bg-ohemia-accent mr-6"></div>
                   <div>
                     <h3 className="font-inter font-semibold text-elaia-charcoal mb-2">Personnalisation</h3>
                     <p className="text-elaia-warm-gray">Cours adaptés à vos besoins et objectifs</p>
-                  </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -190,7 +211,7 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-          </div>
+            </div>
             
           {/* Contenu du cours sélectionné */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -239,7 +260,7 @@ export default function HomePage() {
           </h2>
           <p className="text-2xl font-lora italic text-ohemia-accent mb-8">
             Votre première expérience ELAÏA
-          </p>
+            </p>
           <div className="max-w-xl mx-auto bg-elaia-white p-12 shadow-lg">
             <p className="text-5xl font-playfair text-elaia-charcoal mb-4">
               45 CHF
