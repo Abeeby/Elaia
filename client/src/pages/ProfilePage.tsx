@@ -37,9 +37,9 @@ export default function ProfilePage() {
       last_name: user?.last_name || '',
       email: user?.email || '',
       phone: user?.phone || '',
-      address: user?.address || '',
-      city: user?.city || '',
-      postal_code: user?.postal_code || '',
+      address: (user as any)?.address || '',
+      city: (user as any)?.city || '',
+      postal_code: (user as any)?.postal_code || '',
     },
   });
 
@@ -293,7 +293,7 @@ export default function ProfilePage() {
               <div className="flex items-center text-gray-600">
                 <MapPin className="h-5 w-5 mr-3" />
                 <span className="font-medium mr-2">Adresse:</span>
-                {user?.address}, {user?.postal_code} {user?.city}
+                {(user as any)?.address}, {(user as any)?.postal_code} {(user as any)?.city}
               </div>
             </div>
           )}

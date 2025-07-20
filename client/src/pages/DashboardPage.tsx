@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, CreditCard, TrendingUp, Clock, ChevronRight, Award, Activity } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -16,7 +16,8 @@ interface Booking {
 }
 
 export default function DashboardPage() {
-  const { user, subscription } = useAuthStore();
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
 
   // Récupérer les réservations à venir
   const { data: upcomingBookings } = useQuery({
@@ -36,7 +37,7 @@ export default function DashboardPage() {
     queryFn: creditService.getMySubscription,
   });
 
-  const currentSubscription = subscriptionData?.subscription || subscription;
+  const currentSubscription = subscriptionData?.subscription;
   const nextBooking = upcomingBookings?.[0];
   const totalBookingsThisMonth = currentSubscription?.usage_stats?.total_bookings || 0;
 

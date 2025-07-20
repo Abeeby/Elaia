@@ -43,7 +43,7 @@ export default function HomePage() {
     }, '>');
 
     // Parallax effect for images
-    const images = document.querySelectorAll('.parallax-image');
+    const images = document.querySelectorAll<HTMLElement>('.parallax-image');
     images.forEach((img) => {
       gsap.to(img, {
         yPercent: -20,

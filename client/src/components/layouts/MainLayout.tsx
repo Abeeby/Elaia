@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut, Calendar, CreditCard, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import NotificationSystem from '../NotificationSystem';
 import customToast from '../../utils/toast';
 
 export default function MainLayout() {
@@ -29,8 +28,6 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen bg-elaia-beige">
-      <NotificationSystem />
-      
       {/* Header */}
       <header className={`bg-elaia-white shadow-sm sticky ${showBanner ? 'top-[40px]' : 'top-0'} z-40 transition-all`}>
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,7 +93,7 @@ export default function MainLayout() {
                         {user.first_name} {user.last_name}
                       </p>
                       <p className="text-xs text-elaia-warm-gray">
-                        {user.credits || 0} crédits
+                        {(user as any).credits || 0} crédits
                       </p>
                     </div>
                     <button
@@ -172,7 +169,7 @@ export default function MainLayout() {
                         {user.first_name} {user.last_name}
                       </p>
                       <p className="text-xs text-elaia-warm-gray">
-                        {user.credits || 0} crédits
+                        {(user as any).credits || 0} crédits
                       </p>
                     </div>
                   </div>
