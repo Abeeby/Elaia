@@ -30,9 +30,9 @@ export default function HomePage() {
       tl.fromTo(logoRef.current,
         { scale: 1, y: 0, x: 0, opacity: 1 },
         { 
-          scale: 0.12, 
-          y: "calc(-50vh + 3.5rem)", 
-          x: "calc(-50vw + 7rem)", 
+          scale: 0.06, 
+          y: "-47vh", 
+          x: "-42vw", 
           opacity: 1, // Changez à 0 si vous voulez qu'il disparaisse
           ease: "power2.out" 
         }
@@ -44,10 +44,10 @@ export default function HomePage() {
         onLeave: () => {
           gsap.set(logoRef.current, { 
             position: 'fixed', 
-            top: '0.5rem', 
-            left: '1rem', 
-            transform: 'scale(0.12)', 
-            zIndex: 1000 
+            top: '10px', 
+            left: '20px', 
+            transform: 'scale(0.06)', 
+            zIndex: 1100 
           });
         },
         onEnterBack: () => {
@@ -55,7 +55,7 @@ export default function HomePage() {
             position: 'absolute', 
             top: '50%', 
             left: '50%', 
-            transform: 'translate(-50%, -50%) scale(0.12)',
+            transform: 'translate(-50%, -50%) scale(0.06)',
             zIndex: 'auto'
           });
         }
