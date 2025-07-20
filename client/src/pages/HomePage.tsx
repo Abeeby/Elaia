@@ -134,50 +134,60 @@ export default function HomePage() {
         />
       </section>
 
-      {/* Section Introduction */}
-      <section id="intro-section" className="section-padding bg-elaia-white">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="heading-lg text-elaia-charcoal mb-8">
-                Un espace dédié à votre transformation
-              </h2>
-              <p className="body-lg text-elaia-warm-gray mb-6">
-                ELAÏA est né de la passion d'Albina, instructrice diplômée avec maîtrise fédérale, 
-                pour transmettre une pratique du Pilates exigeante et bienveillante.
+      {/* Section Pourquoi Elaïa Studio */}
+      <section id="intro-section" className="section-padding bg-elaia-cream">
+        <div className="container-custom max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-elaia-warm-gray text-sm uppercase tracking-wider mb-4">
+              Pourquoi Elaïa Studio ?
+            </p>
+            <h2 className="heading-lg text-elaia-charcoal mb-8">
+              Une ambiance qui transforme
+            </h2>
+            <p className="body-lg text-elaia-warm-gray max-w-4xl mx-auto leading-relaxed">
+              Chaque séance est un voyage. Une parenthèse hors du temps pour rétablir l'équilibre entre corps et esprit, 
+              dans un cadre lumineux, feutré, où l'on se sent instantanément à sa place. Ici, le silence devient un allié, 
+              et chaque mouvement compte.
+            </p>
+          </div>
+
+          {/* Valeurs */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+            <div className="text-center">
+              <div className="text-4xl mb-4">🌿</div>
+              <h3 className="font-semibold text-elaia-charcoal mb-3">Bien-être durable</h3>
+              <p className="text-sm text-elaia-warm-gray leading-relaxed">
+                Nos pratiques renforcent la posture, soulagent les tensions et amènent une fluidité nouvelle dans le corps.
               </p>
-              <p className="body-md text-elaia-warm-gray mb-8">
-                Notre studio de 120m² équipé de 8 Reformers haut de gamme vous accueille 
-                dans un cadre moderne et apaisant, conçu pour votre confort et votre progression.
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-4">🔥</div>
+              <h3 className="font-semibold text-elaia-charcoal mb-3">Respiration & conscience</h3>
+              <p className="text-sm text-elaia-warm-gray leading-relaxed">
+                Connectez-vous à l'instant. Les mouvements sont guidés par la respiration, pour un retour à soi naturel.
               </p>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="w-1 h-16 bg-ohemia-accent mr-6"></div>
-                  <div>
-                    <h3 className="font-inter font-semibold text-elaia-charcoal mb-2">Excellence</h3>
-                    <p className="text-elaia-warm-gray">Formation continue et équipement premium</p>
             </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-1 h-16 bg-ohemia-accent mr-6"></div>
-                  <div>
-                    <h3 className="font-inter font-semibold text-elaia-charcoal mb-2">Personnalisation</h3>
-                    <p className="text-elaia-warm-gray">Cours adaptés à vos besoins et objectifs</p>
-                </div>
-                </div>
-              </div>
+            <div className="text-center">
+              <div className="text-4xl mb-4">💪</div>
+              <h3 className="font-semibold text-elaia-charcoal mb-3">Force intérieure</h3>
+              <p className="text-sm text-elaia-warm-gray leading-relaxed">
+                Renforcement profond, amélioration de l'endurance musculaire et sentiment de contrôle retrouvé.
+              </p>
             </div>
-            <div className="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=800" 
-                alt="Studio intérieur"
-                className="w-full h-[600px] object-cover"
-              />
-              <div className="absolute -bottom-8 -left-8 bg-elaia-charcoal text-elaia-white p-8 max-w-xs">
-                <p className="text-3xl font-playfair mb-2">10+</p>
-                <p className="text-sm uppercase tracking-wider">Années d'expérience</p>
-              </div>
+            <div className="text-center">
+              <div className="text-4xl mb-4">🛡️</div>
+              <h3 className="font-semibold text-elaia-charcoal mb-3">Sécurité & bienveillance</h3>
+              <p className="text-sm text-elaia-warm-gray leading-relaxed">
+                Aucun niveau requis. Nos coachs certifiés adaptent chaque mouvement à votre réalité du jour.
+              </p>
             </div>
+          </div>
+
+          {/* Citation */}
+          <div className="text-center">
+            <p className="text-xl italic text-elaia-warm-gray font-lora">
+              "On vient chez Elaïa pour se tonifier... mais on y revient pour s'y retrouver."
+            </p>
           </div>
         </div>
       </section>
