@@ -28,10 +28,15 @@ export default function AdminUsers() {
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Récupérer la liste des utilisateurs
-  const { data: users, isLoading, refetch } = useQuery({
+  const { data: usersData, isLoading, refetch } = useQuery({
     queryKey: ['admin-users-credits'],
     queryFn: adminService.getUsersWithCredits,
   });
+
+  // Ensure users is an array
+  const users = Array.isArray(usersData)
+    ? usersData
+    : usersData?.users || [];
 
   // Mutation pour ajouter des crédits
   const addCreditsMutation = useMutation({
@@ -268,7 +273,7 @@ export default function AdminUsers() {
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-elaia-gold"
                     >
                       <option value="">Sélectionner un utilisateur</option>
-                      {users?.map((user: User) => (
+                      {users.map((user: User) => (
                         <option key={user.id} value={user.email}>
                           {user.first_name} {user.last_name} ({user.email}) - {user.credits_remaining} crédits
                         </option>

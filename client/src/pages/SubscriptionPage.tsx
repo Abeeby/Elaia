@@ -16,10 +16,15 @@ export default function SubscriptionPage() {
   });
 
   // Récupérer l'historique des crédits
-  const { data: creditHistory } = useQuery({
+  const { data: creditHistoryData } = useQuery({
     queryKey: ['credit-history'],
     queryFn: creditService.getCreditHistory,
   });
+
+  // Ensure creditHistory is an array
+  const creditHistory = Array.isArray(creditHistoryData)
+    ? creditHistoryData
+    : creditHistoryData?.history || [];
 
   const subscription = subscriptionData?.subscription;
   const stats = subscription?.usage_stats;

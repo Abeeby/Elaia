@@ -24,12 +24,17 @@ export default function BookingsPage() {
   const queryClient = useQueryClient();
 
   // Récupérer les réservations
-  const { data: bookings, isLoading } = useQuery({
+  const { data: bookingsData, isLoading } = useQuery({
     queryKey: ['my-bookings', selectedTab],
     queryFn: () => bookingService.getMyBookings({ 
       timeframe: selectedTab === 'upcoming' ? 'future' : 'past' 
     }),
   });
+
+  // Ensure bookings is an array
+  const bookings = Array.isArray(bookingsData) 
+    ? bookingsData 
+    : bookingsData?.bookings || [];
 
   // Mutation pour annuler une réservation
   const cancelMutation = useMutation({
@@ -130,7 +135,7 @@ export default function BookingsPage() {
           <div className="text-center py-12">
             <p className="text-elaia-gray">Chargement de vos réservations...</p>
           </div>
-        ) : bookings && bookings.length > 0 ? (
+        ) : bookings.length > 0 ? (
           <div className="space-y-4">
             {bookings.map((booking: Booking) => {
               const classDate = new Date(booking.start_time);
@@ -206,7 +211,7 @@ export default function BookingsPage() {
         )}
 
         {/* Note d'information */}
-        {selectedTab === 'upcoming' && bookings && bookings.length > 0 && (
+                  {selectedTab === 'upcoming' && bookings.length > 0 && (
           <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
             <div className="flex">
               <AlertCircle className="h-5 w-5 text-amber-600 mr-2 flex-shrink-0 mt-0.5" />
