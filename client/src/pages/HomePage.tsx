@@ -252,30 +252,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Section Offre */}
-      <section className="relative py-32 overflow-hidden">
-        <div className="relative container-custom text-center">
-          <h2 className="heading-lg text-elaia-charcoal mb-4">
-            Offre Welcome
-          </h2>
-          <p className="text-2xl font-lora italic text-ohemia-accent mb-8">
-            Votre première expérience ELAÏA
-            </p>
-          <div className="max-w-xl mx-auto bg-elaia-white p-12 shadow-lg">
-            <p className="text-5xl font-playfair text-elaia-charcoal mb-4">
-              45 CHF
-            </p>
-            <p className="text-lg text-elaia-warm-gray mb-8">
-              1 séance achetée + 1 offerte<br />
-              <span className="text-sm">Valable pour les nouveaux clients uniquement</span>
-            </p>
-            <Link to="/register" className="btn-primary">
-              Profiter de l'offre
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Section Instructeurs */}
       <section className="section-padding bg-elaia-white">
         <div className="container-custom">
