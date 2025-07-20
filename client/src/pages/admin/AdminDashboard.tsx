@@ -44,9 +44,12 @@ export default function AdminDashboard() {
   });
 
   // Ensure recentBookings is an array
+  console.log('recentBookingsData:', recentBookingsData);
   const recentBookings = Array.isArray(recentBookingsData)
     ? recentBookingsData
-    : recentBookingsData?.bookings || [];
+    : Array.isArray(recentBookingsData?.bookings)
+    ? recentBookingsData.bookings
+    : [];
 
   // Récupérer les nouveaux clients
   const { data: newClientsData } = useQuery({
@@ -57,9 +60,12 @@ export default function AdminDashboard() {
   });
 
   // Ensure newClients is an array
+  console.log('newClientsData:', newClientsData);
   const newClients = Array.isArray(newClientsData)
     ? newClientsData
-    : newClientsData?.clients || [];
+    : Array.isArray(newClientsData?.clients)
+    ? newClientsData.clients
+    : [];
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-CH', {
@@ -244,7 +250,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="divide-y">
-                                {recentBookings.slice(0, 5).map((booking: any) => (
+                                {recentBookings.length > 0 ? recentBookings.slice(0, 5).map((booking: any) => (
                 <div key={booking.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div>
@@ -264,7 +270,9 @@ export default function AdminDashboard() {
                     </span>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p className="p-4 text-center text-gray-500">Aucune réservation récente</p>
+              )}
             </div>
           </div>
 
@@ -279,7 +287,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="divide-y">
-                                {newClients.slice(0, 5).map((client: any) => (
+                                {newClients.length > 0 ? newClients.slice(0, 5).map((client: any) => (
                 <div key={client.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -300,7 +308,9 @@ export default function AdminDashboard() {
                     </span>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p className="p-4 text-center text-gray-500">Aucun nouveau client</p>
+              )}
             </div>
           </div>
         </div>
