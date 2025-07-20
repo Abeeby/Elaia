@@ -115,13 +115,18 @@ export default function SchedulePage() {
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
   // Récupérer le planning pour la semaine
-  const { data: classes, refetch } = useQuery({
+  const { data: classesData, refetch } = useQuery({
     queryKey: ['schedule-week', format(currentWeekStart, 'yyyy-MM-dd')],
     queryFn: () => classService.getSchedule({ 
       date: format(currentWeekStart, 'yyyy-MM-dd'),
       view: 'week'
     }),
   });
+
+  // Ensure classes is an array
+  const classes = Array.isArray(classesData) 
+    ? classesData 
+    : classesData?.classes || classesData?.data || [];
 
   const handleBookClass = async (classId: number) => {
     if (!isAuthenticated) {
@@ -222,9 +227,9 @@ export default function SchedulePage() {
       return daySchedule?.classes || [];
     }
     
-    return classes?.filter((cls: ClassSession) => 
+    return classes.filter((cls: ClassSession) => 
       format(new Date(cls.start_time), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
-    ) || [];
+    );
   };
 
   return (
