@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // Store
 import { useAuthStore } from './store/authStore';
@@ -43,7 +42,7 @@ import AdminMessages from './pages/admin/AdminMessages';
 // Composants
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
-import SEOHead from './components/SEOHead';
+// import SEOHead from './components/SEOHead';
 
 // Créer le client React Query
 const queryClient = new QueryClient({
@@ -115,7 +114,7 @@ function AppContent() {
 
   return (
     <Router>
-      <SEOHead />
+      {/* <SEOHead /> */}
       <Routes>
         {/* Routes avec MainLayout */}
         <Route path="/" element={<MainLayout />}>
@@ -169,7 +168,6 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AppContent />
-        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </ErrorBoundary>
   );
