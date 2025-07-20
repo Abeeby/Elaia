@@ -64,11 +64,6 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Bandeau promo */}
-      <div className="bg-elaia-charcoal text-white py-2 text-center text-sm">
-        <p>🎉 Offre spéciale : -20% sur tous les abonnements jusqu'au 31 janvier</p>
-      </div>
-
       {/* Hero Section avec animation logo */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-elaia-cream">
         <div 

@@ -24,12 +24,18 @@ export default function MainLayout() {
   ];
 
   const isActive = (path: string) => location.pathname === path;
-  const showBanner = location.pathname === '/';
 
   return (
     <div className="min-h-screen bg-elaia-beige">
+      {/* Bandeau promo */}
+      {location.pathname === '/' && (
+        <div className="bg-elaia-charcoal text-white py-2 text-center text-sm fixed top-0 left-0 right-0 z-50">
+          <p>🎉 Offre spéciale : -20% sur tous les abonnements jusqu'au 31 janvier</p>
+        </div>
+      )}
+      
       {/* Header */}
-      <header className={`bg-elaia-white shadow-sm sticky ${showBanner ? 'top-[40px]' : 'top-0'} z-40 transition-all`}>
+      <header className={`bg-elaia-white shadow-sm sticky ${location.pathname === '/' ? 'top-[40px]' : 'top-0'} z-40 transition-all`}>
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20">
             <div className="flex items-center">
