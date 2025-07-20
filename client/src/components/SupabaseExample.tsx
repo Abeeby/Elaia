@@ -57,7 +57,7 @@ export const SupabaseExample: React.FC = () => {
             <strong>Email :</strong> {user.email}
           </p>
           <p className="body-md">
-            <strong>Crédits disponibles :</strong> {user.credits}
+            <strong>Crédits disponibles :</strong> {(user as any).credits || 0}
           </p>
         </div>
       )}
