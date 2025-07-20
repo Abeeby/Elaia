@@ -4,15 +4,23 @@ type Theme = 'light' | 'dark' | 'auto';
 
 export const useTheme = () => {
   const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem('elaia-theme') as Theme;
-    return savedTheme || 'light';
+    if (typeof localStorage !== 'undefined') {
+      const savedTheme = localStorage.getItem('elaia-theme') as Theme;
+      return savedTheme || 'light';
+    }
+    return 'light';
   });
 
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
   });
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
       setSystemTheme(e.matches ? 'dark' : 'light');
@@ -25,13 +33,18 @@ export const useTheme = () => {
   useEffect(() => {
     const actualTheme = theme === 'auto' ? systemTheme : theme;
     
-    if (actualTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    // Check if document is available
+    if (typeof document !== 'undefined' && document.documentElement) {
+      if (actualTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
     
-    localStorage.setItem('elaia-theme', theme);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('elaia-theme', theme);
+    }
   }, [theme, systemTheme]);
 
   const toggleTheme = () => {
