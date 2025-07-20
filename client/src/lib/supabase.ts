@@ -4,16 +4,84 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Variables Supabase manquantes. Veuillez configurer VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY');
+  console.warn('Supabase configuration manquante. Mode démo activé.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
+    autoRefreshToken: true,
   }
 });
+
+// Helper functions pour l'authentification
+export const supabaseAuth = {
+  async signIn(email: string, password: string) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) throw error;
+    
+    // Récupérer les infos utilisateur depuis la table users
+    if (data.user) {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (userError) throw userError;
+      
+      return {
+        user: userData,
+        session: data.session,
+      };
+    }
+    
+    return data;
+  },
+  
+  async signUp(email: string, password: string, metadata: any) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+      },
+    });
+    
+    if (error) throw error;
+    return data;
+  },
+  
+  async signOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  },
+  
+  async getUser() {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+        
+      if (error) throw error;
+      return userData;
+    }
+    
+    return null;
+  },
+  
+  onAuthStateChange(callback: (event: any, session: any) => void) {
+    return supabase.auth.onAuthStateChange(callback);
+  },
+};
 
 // Types TypeScript pour les tables
 export interface User {

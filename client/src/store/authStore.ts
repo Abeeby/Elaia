@@ -1,37 +1,21 @@
 import { create } from 'zustand';
-import { authService } from '../services/api';
-import { mockAuthService } from '../services/mockApi';
+import { supabaseAuth } from '../lib/supabase';
+import customToast from '../utils/toast';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   first_name: string;
   last_name: string;
   phone?: string;
   role: string;
-  is_verified: boolean;
-  address?: string;
-  city?: string;
-  postal_code?: string;
+  credits?: number;
   created_at?: string;
   updated_at?: string;
 }
 
-interface Subscription {
-  id: number;
-  plan_name: string;
-  plan_type: string;
-  credits_remaining?: number;
-  end_date?: string;
-  usage_stats?: {
-    total_bookings: number;
-    total_credits_used: number;
-  };
-}
-
 interface AuthState {
   user: User | null;
-  subscription: Subscription | null;
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -43,33 +27,92 @@ interface AuthState {
   fetchProfile: () => Promise<void>;
   updateProfile: (data: any) => Promise<void>;
   updateUser: (user: User) => void;
-  setToken: (token: string) => void;
+  initAuth: () => Promise<void>;
 }
+
+// Mode démo - utilisateurs de test
+const DEMO_USERS = {
+  'admin@elaiastudio.ch': {
+    id: 'demo-admin',
+    email: 'admin@elaiastudio.ch',
+    first_name: 'Admin',
+    last_name: 'ELAÏA',
+    phone: '+41 22 123 45 67',
+    role: 'admin',
+    credits: 999,
+  },
+  'marie.dupont@email.com': {
+    id: 'demo-client',
+    email: 'marie.dupont@email.com',
+    first_name: 'Marie',
+    last_name: 'Dupont',
+    phone: '+41 79 123 45 67',
+    role: 'client',
+    credits: 10,
+  },
+};
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
-  subscription: null,
-  token: localStorage.getItem('token'),
+  token: null,
   isLoading: false,
-  isAuthenticated: !!localStorage.getItem('token'),
+  isAuthenticated: false,
+
+  initAuth: async () => {
+    try {
+      const user = await supabaseAuth.getUser();
+      if (user) {
+        set({ 
+          user: user as User, 
+          isAuthenticated: true,
+          isLoading: false 
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation de l\'auth:', error);
+    }
+  },
 
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      const response = await authService.login(email, password);
-      const { token, user } = response;
+      // Mode démo - vérifier les comptes de test
+      if (email === 'admin@elaiastudio.ch' && password === 'admin123') {
+        const demoUser = DEMO_USERS['admin@elaiastudio.ch'];
+        set({ 
+          user: demoUser as User, 
+          isAuthenticated: true,
+          isLoading: false 
+        });
+        customToast.success('Connexion réussie (mode démo)');
+        return;
+      }
       
-      localStorage.setItem('token', token);
-      set({ 
-        token, 
-        user, 
-        isAuthenticated: true,
-        isLoading: false 
-      });
-      
-      // Récupérer le profil complet
-      await get().fetchProfile();
-    } catch (error) {
+      if (email === 'marie.dupont@email.com' && password === 'client123') {
+        const demoUser = DEMO_USERS['marie.dupont@email.com'];
+        set({ 
+          user: demoUser as User, 
+          isAuthenticated: true,
+          isLoading: false 
+        });
+        customToast.success('Connexion réussie (mode démo)');
+        return;
+      }
+
+      // Tentative de connexion avec Supabase
+      try {
+        const { user } = await supabaseAuth.signIn(email, password);
+        set({ 
+          user: user as User, 
+          isAuthenticated: true,
+          isLoading: false 
+        });
+        customToast.success('Connexion réussie');
+      } catch (supabaseError) {
+        // Si Supabase échoue, vérifier si c'est un compte démo
+        throw new Error('Email ou mot de passe incorrect');
+      }
+    } catch (error: any) {
       set({ isLoading: false });
       throw error;
     }
@@ -78,27 +121,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (userData: any) => {
     set({ isLoading: true });
     try {
-      let response;
-      try {
-        response = await authService.register(userData);
-      } catch (apiError) {
-        // Si l'API n'est pas disponible, utiliser le mock en mode démo
-        console.warn('API non disponible, utilisation du mode démo');
-        response = await mockAuthService.register(userData);
-      }
+      // Mode démo - créer un utilisateur fictif
+      const demoUser = {
+        id: `demo-${Date.now()}`,
+        email: userData.email,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        phone: userData.phone,
+        role: 'client',
+        credits: 0,
+      };
       
-      const { token, user } = response;
-      
-      localStorage.setItem('token', token);
       set({ 
-        token, 
-        user, 
+        user: demoUser as User, 
         isAuthenticated: true,
         isLoading: false 
       });
       
-      // Récupérer le profil complet
-      await get().fetchProfile();
+      customToast.success('Inscription réussie (mode démo)');
     } catch (error) {
       set({ isLoading: false });
       throw error;
@@ -106,46 +146,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: () => {
-    localStorage.removeItem('token');
+    supabaseAuth.signOut().catch(console.error);
     set({ 
       user: null, 
-      subscription: null,
       token: null, 
       isAuthenticated: false 
     });
+    customToast.success('Déconnexion réussie');
   },
 
   fetchProfile: async () => {
     try {
-      const response = await authService.getProfile();
-      set({ 
-        user: response.user,
-        subscription: response.subscription
-      });
-    } catch (error) {
-      // Si erreur 401, déconnecter l'utilisateur
-      if ((error as any).response?.status === 401) {
-        get().logout();
+      const user = await supabaseAuth.getUser();
+      if (user) {
+        set({ user: user as User });
       }
-      throw error;
+    } catch (error) {
+      console.error('Erreur lors de la récupération du profil:', error);
     }
   },
 
   updateProfile: async (data: any) => {
     set({ isLoading: true });
     try {
-      await authService.updateProfile(data);
-      await get().fetchProfile();
-      set({ isLoading: false });
+      // En mode démo, simuler la mise à jour
+      const currentUser = get().user;
+      if (currentUser) {
+        const updatedUser = { ...currentUser, ...data };
+        set({ user: updatedUser, isLoading: false });
+        customToast.success('Profil mis à jour');
+      }
     } catch (error) {
       set({ isLoading: false });
       throw error;
     }
-  },
-
-  setToken: (token: string) => {
-    localStorage.setItem('token', token);
-    set({ token, isAuthenticated: true });
   },
 
   updateUser: (user: User) => {

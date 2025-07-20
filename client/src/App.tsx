@@ -1,7 +1,10 @@
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'react-hot-toast';
-import { useEffect } from 'react';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+// Store
+import { useAuthStore } from './store/authStore';
 
 // Layouts
 import MainLayout from './components/layouts/MainLayout';
@@ -9,160 +12,105 @@ import AuthLayout from './components/layouts/AuthLayout';
 
 // Pages publiques
 import HomePage from './pages/HomePage';
+import CoursesPage from './pages/CoursesPage';
+import SchedulePage from './pages/SchedulePage';
+import PricingPage from './pages/PricingPage';
 import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import FaqPage from './pages/FaqPage';
+import LegalPage from './pages/LegalPage';
+
+// Pages d'authentification
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import PricingPage from './pages/PricingPage';
-import FaqPage from './pages/FaqPage';
-import ContactPage from './pages/ContactPage';
-import LegalPage from './pages/LegalPage';
-import CoursesPage from './pages/CoursesPage';
 
 // Pages privées
 import DashboardPage from './pages/DashboardPage';
-import SchedulePage from './pages/SchedulePage';
-import BookingsPage from './pages/BookingsPage';
 import ProfilePage from './pages/ProfilePage';
+import BookingsPage from './pages/BookingsPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import CreditHistoryPage from './pages/CreditHistoryPage';
+import ProspectsPage from './pages/ProspectsPage';
+import TrialPage from './pages/TrialPage';
 
-// Pages admin - Lazy loading pour optimiser le bundle
-import { lazy, Suspense } from 'react';
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
-const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
-const AdminClasses = lazy(() => import('./pages/admin/AdminClasses'));
-const AdminReports = lazy(() => import('./pages/admin/AdminReports'));
-const AdminMessages = lazy(() => import('./pages/admin/AdminMessages'));
+// Pages admin
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminClasses from './pages/admin/AdminClasses';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminReports from './pages/admin/AdminReports';
+import AdminMessages from './pages/admin/AdminMessages';
 
 // Composants
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
-import LoadingSpinner from './components/LoadingSpinner';
-import NotificationSystem, { useNotifications } from './components/NotificationSystem';
-import SmartChat from './components/SmartChat';
-
-// Store
-import { useAuthStore } from './store/authStore';
+import SEOHead from './components/SEOHead';
 
 // Créer le client React Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
     },
   },
 });
 
 function App() {
-  const { isAuthenticated, fetchProfile } = useAuthStore();
-  const notifications = useNotifications();
+  const initAuth = useAuthStore((state) => state.initAuth);
 
   useEffect(() => {
-    // Si l'utilisateur est authentifié, récupérer son profil
-    if (isAuthenticated) {
-      fetchProfile().catch(() => {
-        // Géré dans le store
-      });
-    }
-  }, [isAuthenticated, fetchProfile]);
+    // Initialiser l'authentification au démarrage
+    initAuth();
+  }, [initAuth]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
+        <SEOHead />
         <Routes>
-          {/* Routes publiques avec AuthLayout */}
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
-
           {/* Routes avec MainLayout */}
-          <Route element={<MainLayout />}>
-            {/* Pages publiques */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/faq" element={<FaqPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/legal" element={<LegalPage />} />
-            <Route path="/courses" element={<CoursesPage />} />
-            <Route path="/schedule" element={<SchedulePage />} />
-
-            {/* Pages privées */}
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="courses" element={<CoursesPage />} />
+            <Route path="schedule" element={<SchedulePage />} />
+            <Route path="pricing" element={<PricingPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="contact" element={<ContactPage />} />
+            <Route path="faq" element={<FaqPage />} />
+            <Route path="legal" element={<LegalPage />} />
+            
+            {/* Routes privées */}
             <Route element={<PrivateRoute />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/bookings" element={<BookingsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/subscription" element={<SubscriptionPage />} />
-              <Route path="/credits/history" element={<CreditHistoryPage />} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="bookings" element={<BookingsPage />} />
+              <Route path="subscription" element={<SubscriptionPage />} />
+              <Route path="credit-history" element={<CreditHistoryPage />} />
+              <Route path="prospects" element={<ProspectsPage />} />
+              <Route path="trial" element={<TrialPage />} />
             </Route>
-
-            {/* Pages admin */}
-            <Route element={<AdminRoute />}>
-              <Route path="/admin" element={
-                <Suspense fallback={<LoadingSpinner text="Chargement du tableau de bord..." />}>
-                  <AdminDashboard />
-                </Suspense>
-              } />
-              <Route path="/admin/users" element={
-                <Suspense fallback={<LoadingSpinner text="Chargement des utilisateurs..." />}>
-                  <AdminUsers />
-                </Suspense>
-              } />
-              <Route path="/admin/classes" element={
-                <Suspense fallback={<LoadingSpinner text="Chargement des cours..." />}>
-                  <AdminClasses />
-                </Suspense>
-              } />
-              <Route path="/admin/reports" element={
-                <Suspense fallback={<LoadingSpinner text="Chargement des rapports..." />}>
-                  <AdminReports />
-                </Suspense>
-              } />
-              <Route path="/admin/messages" element={
-                <Suspense fallback={<LoadingSpinner text="Chargement des messages..." />}>
-                  <AdminMessages />
-                </Suspense>
-              } />
+            
+            {/* Routes admin */}
+            <Route path="admin" element={<AdminRoute />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="classes" element={<AdminClasses />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="reports" element={<AdminReports />} />
+              <Route path="messages" element={<AdminMessages />} />
             </Route>
           </Route>
-
-          {/* Redirection par défaut */}
+          
+          {/* Routes avec AuthLayout */}
+          <Route element={<AuthLayout />}>
+            <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
+          </Route>
+          
+          {/* Redirection 404 */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
-      
-      {/* Notifications toast */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#333',
-            color: '#fff',
-          },
-          success: {
-            style: {
-              background: '#6A7352',
-            },
-          },
-          error: {
-            style: {
-              background: '#ef4444',
-            },
-          },
-        }}
-      />
-      
-      {/* Système de notifications global */}
-      <NotificationSystem 
-        notifications={notifications.notifications}
-        onDismiss={notifications.removeNotification}
-      />
-      
-      {/* Chatbot intelligent */}
-      <SmartChat />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
