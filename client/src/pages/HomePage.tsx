@@ -192,6 +192,80 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Section Classes - Style moderne */}
+      <section className="bg-elaia-charcoal">
+        <div className="grid grid-cols-1 md:grid-cols-3">
+          {/* Yoga */}
+          <div className="relative group overflow-hidden">
+            <div className="aspect-[4/5] relative">
+              <img 
+                src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80&fit=crop&crop=entropy"
+                alt="Yoga"
+                className="w-full h-full object-cover grayscale"
+              />
+              <div className="absolute inset-0 bg-black/40"></div>
+              <div className="absolute inset-0 flex flex-col justify-end p-12">
+                <p className="text-white/70 text-xs font-inter uppercase tracking-[0.2em] mb-3">COURS</p>
+                <h3 className="text-white text-3xl font-playfair mb-6">YOGA</h3>
+                <p className="text-white/80 text-sm leading-relaxed mb-8 max-w-sm">
+                  Puisez dans votre force intérieure pour une nouvelle conscience du corps et de l'esprit. 
+                  Trouvez votre équilibre et votre sérénité.
+                </p>
+                <Link to="/schedule" className="inline-flex items-center text-white text-xs font-inter uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">
+                  RÉSERVER MAINTENANT
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Reformer */}
+          <div className="relative group overflow-hidden">
+            <div className="aspect-[4/5] relative">
+              <img 
+                src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80&fit=crop&crop=entropy"
+                alt="Reformer"
+                className="w-full h-full object-cover grayscale"
+              />
+              <div className="absolute inset-0 bg-black/40"></div>
+              <div className="absolute inset-0 flex flex-col justify-end p-12">
+                <p className="text-white/70 text-xs font-inter uppercase tracking-[0.2em] mb-3">COURS</p>
+                <h3 className="text-white text-3xl font-playfair mb-6">REFORMER</h3>
+                <p className="text-white/80 text-sm leading-relaxed mb-8 max-w-sm">
+                  Vivez un entraînement dynamique complet. Activez votre centre 
+                  et développez force et flexibilité en profondeur.
+                </p>
+                <Link to="/schedule" className="inline-flex items-center text-white text-xs font-inter uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">
+                  RÉSERVER MAINTENANT
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Pilates */}
+          <div className="relative group overflow-hidden">
+            <div className="aspect-[4/5] relative">
+              <img 
+                src="https://images.unsplash.com/photo-1599901860146-d62f2ebdb5d4?w=800&q=80&fit=crop&crop=entropy"
+                alt="Pilates"
+                className="w-full h-full object-cover grayscale"
+              />
+              <div className="absolute inset-0 bg-black/40"></div>
+              <div className="absolute inset-0 flex flex-col justify-end p-12">
+                <p className="text-white/70 text-xs font-inter uppercase tracking-[0.2em] mb-3">COURS</p>
+                <h3 className="text-white text-3xl font-playfair mb-6">PILATES</h3>
+                <p className="text-white/80 text-sm leading-relaxed mb-8 max-w-sm">
+                  Révélez votre potentiel et ressentez la différence. 
+                  Atteignez votre meilleure forme avec un maximum d'efficacité.
+                </p>
+                <Link to="/schedule" className="inline-flex items-center text-white text-xs font-inter uppercase tracking-[0.2em] hover:opacity-70 transition-opacity">
+                  RÉSERVER MAINTENANT
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Section Cours Sélecteur */}
       <section className="section-padding bg-elaia-light-gray">
         <div className="container-custom">
