@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown, Menu, X } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+// Temporarily disable GSAP to debug
+// import gsap from 'gsap';
+// import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+// gsap.registerPlugin(ScrollTrigger);
 
 export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -12,63 +13,67 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    try {
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReducedMotion || !logoRef.current || !heroRef.current) return;
+    // Temporarily disable all animations to debug
+    console.log('HomePage mounted - animations disabled for debugging');
+    return;
+    
+    // try {
+    //   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    //   if (prefersReducedMotion || !logoRef.current || !heroRef.current) return;
 
-      const logo = logoRef.current;
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1,
-        }
-      });
+    //   const logo = logoRef.current;
+    //   const tl = gsap.timeline({
+    //     scrollTrigger: {
+    //       trigger: heroRef.current,
+    //       start: 'top top',
+    //       end: 'bottom top',
+    //       scrub: 1,
+    //     }
+    //   });
 
-      // Animation du logo en plusieurs étapes comme Ohemia
-      tl.to(logo, {
-        scale: 0.3,
-        y: -window.innerHeight * 0.35,
-        x: -window.innerWidth * 0.35,
-        duration: 1,
-        ease: 'power2.inOut'
-      });
+    //   // Animation du logo en plusieurs étapes comme Ohemia
+    //   tl.to(logo, {
+    //     scale: 0.3,
+    //     y: -window.innerHeight * 0.35,
+    //     x: -window.innerWidth * 0.35,
+    //     duration: 1,
+    //     ease: 'power2.inOut'
+    //   });
       
-      const logoText = logo.querySelector('.logo-text');
-      if (logoText) {
-        tl.to(logoText, {
-          opacity: 0,
-          duration: 0.3
-        }, '<0.5');
-      }
+    //   const logoText = logo.querySelector('.logo-text');
+    //   if (logoText) {
+    //     tl.to(logoText, {
+    //       opacity: 0,
+    //       duration: 0.3
+    //     }, '<0.5');
+    //   }
       
-      tl.to(logo, {
-        opacity: 0,
-        duration: 0.3
-      }, '>');
+    //   tl.to(logo, {
+    //     opacity: 0,
+    //     duration: 0.3
+    //   }, '>');
 
-      // Parallax effect for images
-      const images = document.querySelectorAll<HTMLElement>('.parallax-image');
-      images.forEach((img) => {
-        gsap.to(img, {
-          yPercent: -20,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: img,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true
-          }
-        });
-      });
+    //   // Parallax effect for images
+    //   const images = document.querySelectorAll<HTMLElement>('.parallax-image');
+    //   images.forEach((img) => {
+    //     gsap.to(img, {
+    //       yPercent: -20,
+    //       ease: 'none',
+    //       scrollTrigger: {
+    //         trigger: img,
+    //         start: 'top bottom',
+    //         end: 'bottom top',
+    //         scrub: true
+    //       }
+    //     });
+    //   });
 
-      return () => {
-        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-      };
-    } catch (error) {
-      console.error('Error in HomePage animations:', error);
-    }
+    //   return () => {
+    //     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    //   };
+    // } catch (error) {
+    //   console.error('Error in HomePage animations:', error);
+    // }
   }, []);
 
   return (
