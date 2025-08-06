@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import ScrollToTop from './components/ScrollToTop';
 
 // Store
 import { useAuthStore } from './store/authStore';
@@ -116,6 +117,7 @@ function AppContent() {
 
   return (
     <Router>
+      <ScrollToTop />
       <SEOHead />
       <Routes>
         {/* Routes avec MainLayout */}
