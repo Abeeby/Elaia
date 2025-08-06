@@ -79,8 +79,8 @@ export default function HomePage() {
           ref={logoRef}
           className="absolute inset-0 flex flex-col items-center justify-center z-10"
         >
-          <h1 className="text-[15vw] md:text-[12vw] font-playfair text-elaia-charcoal tracking-[0.2em] leading-none writing-mode-vertical">
-            <span className="inline-block" style={{ writingMode: 'vertical-rl', textOrientation: 'upright', letterSpacing: '0.5em' }}>
+          <h1 className="text-[8vw] md:text-[6vw] font-playfair text-elaia-charcoal leading-none">
+            <span className="inline-block" style={{ writingMode: 'vertical-rl', textOrientation: 'upright', letterSpacing: '0.1em' }}>
               ELAÏA
             </span>
           </h1>
