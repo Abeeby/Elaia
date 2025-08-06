@@ -8,47 +8,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     try {
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReducedMotion || !logoRef.current || !heroRef.current) return;
-
-      const logo = logoRef.current;
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1,
-        }
-      });
-
-      // Animation du logo en plusieurs étapes comme Ohemia
-      tl.to(logo, {
-        scale: 0.3,
-        y: -window.innerHeight * 0.35,
-        x: -window.innerWidth * 0.35,
-        duration: 1,
-        ease: 'power2.inOut'
-      });
-      
-      const logoText = logo.querySelector('.logo-text');
-      if (logoText) {
-        tl.to(logoText, {
-          opacity: 0,
-          duration: 0.3
-        }, '<0.5');
-      }
-      
-      tl.to(logo, {
-        opacity: 0,
-        duration: 0.3
-      }, '>');
-
-      // Parallax effect for images
+      // Garder seulement l'effet parallax pour les images, sans animation du logo
       const images = document.querySelectorAll<HTMLElement>('.parallax-image');
       images.forEach((img) => {
         gsap.to(img, {
@@ -75,12 +39,9 @@ export default function HomePage() {
     <>
       {/* Hero Section avec animation logo */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-elaia-cream">
-        <div 
-          ref={logoRef}
-          className="absolute inset-0 flex flex-col items-center justify-center z-10"
-        >
-          <h1 className="text-[8vw] md:text-[6vw] font-playfair text-elaia-charcoal leading-none">
-            <span className="inline-block" style={{ writingMode: 'vertical-rl', textOrientation: 'upright', letterSpacing: '0.1em' }}>
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+          <h1 className="text-[5vw] md:text-[4vw] font-playfair text-elaia-charcoal leading-none">
+            <span className="inline-block" style={{ writingMode: 'vertical-rl', textOrientation: 'upright', letterSpacing: '0.05em' }}>
               ELAÏA
             </span>
           </h1>
