@@ -130,9 +130,6 @@ export default function PricingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {/* Pack Découverte */}
               <div className="group relative">
-                <div className="absolute -top-3 left-8 bg-ohemia-sage text-elaia-white px-4 py-1 text-xs font-inter uppercase tracking-wider rounded-full">
-                  Premium
-                  </div>
                 <div className="bg-elaia-white h-full flex flex-col p-8 border border-elaia-muted shadow-sm hover:shadow-lg transition-all duration-300">
                   <div className="mb-8">
                     <h3 className="heading-sm text-elaia-charcoal mb-2">
@@ -234,11 +231,7 @@ export default function PricingPage() {
                   
                   return (
                       <div key={plan.id} className="group relative">
-                        {popular && (
-                          <div className="absolute -top-3 left-8 bg-ohemia-sage text-elaia-white px-4 py-1 text-xs font-inter uppercase tracking-wider rounded-full">
-                            Premium
-                        </div>
-                      )}
+
                         <div className="bg-elaia-white h-full flex flex-col p-8 border border-elaia-muted shadow-sm hover:shadow-lg transition-all duration-300">
                           <div className="mb-8">
                             <h3 className="heading-sm text-elaia-charcoal mb-2">
@@ -318,9 +311,6 @@ export default function PricingPage() {
 
                   {/* 30 crédits */}
                   <div className="group relative">
-                    <div className="absolute -top-3 left-8 bg-ohemia-sage text-elaia-white px-4 py-1 text-xs font-inter uppercase tracking-wider rounded-full">
-                      Premium
-                    </div>
                     <div className="bg-elaia-white h-full flex flex-col p-8 border border-elaia-muted shadow-sm hover:shadow-lg transition-all duration-300">
                       <div className="mb-8">
                         <h3 className="heading-sm text-elaia-charcoal mb-2">
@@ -429,9 +419,6 @@ export default function PricingPage() {
 
                 {/* Premium+ */}
                 <div className="group relative">
-                  <div className="absolute -top-3 left-8 bg-ohemia-sage text-elaia-white px-4 py-1 text-xs font-inter uppercase tracking-wider rounded-full">
-                    ⭐ Premium
-                  </div>
                   <div className="bg-elaia-white h-full flex flex-col p-8 border-2 border-ohemia-sage shadow-lg transition-all duration-300">
                     <div className="mb-8">
                       <h3 className="heading-sm text-elaia-charcoal mb-2">
@@ -524,11 +511,7 @@ export default function PricingPage() {
                     
                     return (
                       <div key={plan.id} className="group relative">
-                        {isPremium && (
-                          <div className="absolute -top-3 left-8 bg-ohemia-sage text-elaia-white px-4 py-1 text-xs font-inter uppercase tracking-wider rounded-full">
-                            Premium
-                        </div>
-                      )}
+
                         <div className={`bg-elaia-white h-full flex flex-col p-8 transition-all duration-300 ${
                           isUnlimited ? 'border-2 border-ohemia-accent shadow-lg' : 'border border-elaia-muted shadow-sm hover:shadow-lg'
                         }`}>
