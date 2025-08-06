@@ -40,10 +40,8 @@ export default function HomePage() {
       {/* Hero Section avec animation logo */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-elaia-cream">
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-          <h1 className="text-[5vw] md:text-[4vw] font-playfair text-elaia-charcoal leading-none">
-            <span className="inline-block" style={{ writingMode: 'vertical-rl', textOrientation: 'upright', letterSpacing: '0.05em' }}>
-              ELAÏA
-            </span>
+          <h1 className="text-[8vw] md:text-[6vw] font-playfair text-elaia-charcoal leading-none tracking-[0.2em]">
+            ELAÏA
           </h1>
           <div className="logo-text mt-8 text-center">
             <p className="text-sm md:text-base font-inter uppercase tracking-[0.3em] text-elaia-warm-gray mb-4">
