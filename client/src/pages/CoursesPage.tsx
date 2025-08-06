@@ -150,59 +150,7 @@ const CoursesPage: React.FC = () => {
           </div>
         </section>
 
-        {/* Section Introduction */}
-        <section className="section-padding bg-elaia-white">
-          <div className="container-custom max-w-4xl mx-auto text-center">
-            <div className="mb-8">
-              <p className="text-elaia-warm-gray text-sm uppercase tracking-wider mb-4">
-                Pourquoi Elaïa Studio ?
-              </p>
-              <h2 className="heading-lg text-elaia-charcoal mb-8">
-                Une ambiance qui transforme
-              </h2>
-              <p className="body-lg text-elaia-warm-gray leading-relaxed">
-                Chaque séance est un voyage. Une parenthèse hors du temps pour rétablir l'équilibre entre corps et esprit, dans un cadre lumineux, feutré, où l'on se sent instantanément à sa place. Ici, le silence devient un allié, et chaque mouvement compte.
-              </p>
-            </div>
 
-            {/* Valeurs */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-              <div className="text-center">
-                <div className="text-3xl mb-4">🌿</div>
-                <h3 className="font-semibold text-elaia-charcoal mb-2">Bien-être durable</h3>
-                <p className="text-sm text-elaia-warm-gray">
-                  Nos pratiques renforcent la posture, soulagent les tensions et amènent une fluidité nouvelle dans le corps.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl mb-4">🧘‍♀️</div>
-                <h3 className="font-semibold text-elaia-charcoal mb-2">Respiration & conscience</h3>
-                <p className="text-sm text-elaia-warm-gray">
-                  Connectez-vous à l'instant. Les mouvements sont guidés par la respiration, pour un retour à soi naturel.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl mb-4">💪</div>
-                <h3 className="font-semibold text-elaia-charcoal mb-2">Force intérieure</h3>
-                <p className="text-sm text-elaia-warm-gray">
-                  Renforcement profond, amélioration de l'endurance musculaire et sentiment de contrôle retrouvé.
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl mb-4">🛡️</div>
-                <h3 className="font-semibold text-elaia-charcoal mb-2">Sécurité & bienveillance</h3>
-                <p className="text-sm text-elaia-warm-gray">
-                  Aucun niveau requis. Nos coachs certifiés adaptent chaque mouvement à votre réalité du jour.
-                </p>
-              </div>
-            </div>
-
-            {/* Citation */}
-            <div className="italic text-xl text-elaia-warm-gray font-lora">
-              "On vient chez Elaïa pour se tonifier... mais on y revient pour s'y retrouver."
-            </div>
-          </div>
-        </section>
 
         {/* Section Cours */}
         <section className="section-padding bg-elaia-light-gray">
