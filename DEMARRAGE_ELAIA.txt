@@ -1,0 +1,50 @@
+===============================================
+        ELAIA STUDIO - GUIDE DE DEMARRAGE
+===============================================
+
+PROBLEME D'ENCODAGE RESOLU !
+----------------------------
+Le script original avait des problemes avec les emojis et accents.
+J'ai cree 2 nouveaux scripts qui fonctionnent :
+
+1. SCRIPT POWERSHELL (sans accents) :
+   .\start-simple.ps1
+
+2. SCRIPT BATCH (compatible Windows) :
+   start-elaia.bat
+
+
+ACCES A L'APPLICATION
+---------------------
+Frontend : http://localhost:5173
+Backend  : http://localhost:5001/api
+Supabase : https://app.supabase.com
+
+
+COMPTES DE DEMONSTRATION
+------------------------
+Admin  : admin@elaiastudio.ch / admin123
+Client : marie.dupont@email.com / client123
+
+
+VOTRE PROJET SUPABASE
+---------------------
+URL     : https://tgwrpvxexwnohptafosx.supabase.co
+Project : tgwrpvxexwnohptafosx
+
+
+DOCUMENTATION
+-------------
+- GUIDE_SUPABASE_INTEGRATION.md
+- SUPABASE_INTEGRATION_COMPLETE.md
+- NOUVEAU_DESIGN_OHEMIA.md
+
+
+DEMARRAGE RAPIDE
+----------------
+1. Ouvrez un terminal
+2. Tapez : start-elaia.bat
+3. Ouvrez : http://localhost:5173
+4. Connectez-vous avec un compte demo
+
+=============================================== 

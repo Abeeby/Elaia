@@ -1,0 +1,68 @@
+# EXEMPLES DE COMMANDES POUR TESTER LES CRÉDITS
+# Copiez-collez ces commandes dans votre terminal (Git Bash ou WSL sur Windows)
+
+# 1. VÉRIFIER QUE LE SERVEUR FONCTIONNE
+curl http://localhost:5000/api/health
+
+# 2. SE CONNECTER COMME ADMIN
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{\"email\": \"admin@elaiastudio.ch\", \"password\": \"admin123\"}"
+
+# 3. SE CONNECTER COMME CLIENT
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{\"email\": \"marie.dupont@email.com\", \"password\": \"client123\"}"
+
+# 4. VOIR LES CRÉDITS DE L'ADMIN
+curl -X GET http://localhost:5000/api/credits/mine \
+  -H "Authorization: Bearer test-token-admin-123"
+
+# 5. VOIR LES CRÉDITS DU CLIENT MARIE
+curl -X GET http://localhost:5000/api/credits/mine \
+  -H "Authorization: Bearer test-token-client-456"
+
+# 6. VOIR TOUS LES UTILISATEURS (ADMIN SEULEMENT)
+curl -X GET http://localhost:5000/api/admin/users \
+  -H "Authorization: Bearer test-token-admin-123"
+
+# 7. AJOUTER 10 CRÉDITS À MARIE (ADMIN SEULEMENT)
+curl -X POST http://localhost:5000/api/admin/add-credits \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer test-token-admin-123" \
+  -d "{\"userEmail\": \"marie.dupont@email.com\", \"credits\": 10}"
+
+# 8. AJOUTER 5 CRÉDITS À L'ADMIN
+curl -X POST http://localhost:5000/api/admin/add-credits \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer test-token-admin-123" \
+  -d "{\"userEmail\": \"admin@elaiastudio.ch\", \"credits\": 5}"
+
+# 9. RECHARGER LES CRÉDITS DE MARIE (DEMO)
+curl -X POST http://localhost:5000/api/credits/reload \
+  -H "Authorization: Bearer test-token-client-456"
+
+# 10. VOIR LE PLANNING DES COURS
+curl -X GET http://localhost:5000/api/classes/schedule \
+  -H "Authorization: Bearer test-token-client-456"
+
+# 11. RÉSERVER UN COURS (ID 101 = 3 crédits)
+curl -X POST http://localhost:5000/api/bookings/book/101 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer test-token-client-456"
+
+# 12. VOIR MES RÉSERVATIONS FUTURES
+curl -X GET http://localhost:5000/api/bookings/my-bookings?timeframe=future \
+  -H "Authorization: Bearer test-token-client-456"
+
+# ===============================================
+# POUR WINDOWS PowerShell, utilisez cette syntaxe :
+# ===============================================
+
+# Exemple pour PowerShell (Windows) :
+# Invoke-RestMethod -Uri "http://localhost:5000/api/health" -Method GET
+
+# Ajouter des crédits (PowerShell) :
+# $headers = @{ "Authorization" = "Bearer test-token-admin-123"; "Content-Type" = "application/json" }
+# $body = '{"userEmail": "marie.dupont@email.com", "credits": 10}'
+# Invoke-RestMethod -Uri "http://localhost:5000/api/admin/add-credits" -Method POST -Headers $headers -Body $body 

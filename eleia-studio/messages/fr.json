@@ -1,0 +1,79 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "booking": "Réservation",
+    "about": "À propos",
+    "studio": "Studio",
+    "philosophy": "Philosophie",
+    "team": "Équipe",
+    "projects": "Projets",
+    "academy": "Academy",
+    "pricing": "Tarifs",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "L'union parfaite du",
+    "subtitle": "Yoga & Pilates modernes",
+    "cta": "Réserver maintenant"
+  },
+  "services": {
+    "yoga": {
+      "title": "YOGA",
+      "subtitle": "Choisissez votre parcours Yoga personnel",
+      "description": "Puisez dans votre force intérieure pour une nouvelle conscience corporelle et mentale.",
+      "book": "Réserver maintenant"
+    },
+    "pilates": {
+      "title": "PILATES",
+      "subtitle": "Choisissez votre parcours Pilates personnel",
+      "description": "Vivez un entraînement complet dynamique. Activez votre centre et augmentez force et flexibilité.",
+      "book": "Réserver maintenant"
+    },
+    "reformer": {
+      "title": "REFORMER",
+      "subtitle": "Choisissez votre parcours Reformer personnel",
+      "description": "Libérez votre potentiel et ressentez la différence. Efficacité maximale pour votre meilleure forme.",
+      "book": "Réserver maintenant"
+    }
+  },
+  "philosophy": {
+    "title": "Un lieu spécial pour vous",
+    "text1": "Swiss Pilates est un studio de Yoga et Pilates d'inspiration traditionnelle avec une orientation moderne. Un lieu de transformation, de retraite et de ressourcement, un espace pour créer des liens avec les autres et avec vous-même, et enfin, pour vous défier et grandir.",
+    "text2": "Ici commence votre voyage vers une nouvelle conscience corporelle et mentale. Nous ne nous concentrons pas sur des idéaux conventionnels, mais nous vous offrons l'espace pour votre épanouissement authentique. Il s'agit de plus que du mouvement. Il s'agit de vous.",
+    "readMore": "En savoir plus"
+  },
+  "instructors": {
+    "title": "Rencontrez vos instructeurs",
+    "viewTeam": "Notre équipe"
+  },
+  "wellbeing": {
+    "title": "Votre bien-être est notre passion",
+    "text1": "Chaque personne est unique. C'est pourquoi chez Swiss Pilates, nous proposons des routines holistiques adaptées exactement à votre niveau et à vos besoins. Composez votre programme de bien-être individuel à partir de notre offre de cours variée.",
+    "text2": "Swiss Pilates unit régénération, renforcement et spiritualité en un seul lieu. Pour un voyage de self-care sans compromis.",
+    "readMore": "Plus sur notre philosophie"
+  },
+  "testimonials": {
+    "subtitle": "Ce que vous dites",
+    "title": "Amour des clients",
+    "rating": "5.00 sur 147 avis"
+  },
+  "newsletter": {
+    "title": "Inscrivez-vous à notre",
+    "titleBold": "Newsletter",
+    "subtitle": "pour des offres exclusives et des invitations à des événements spéciaux.",
+    "firstName": "Prénom",
+    "email": "Adresse e-mail",
+    "consent": "J'accepte de recevoir des emails marketing et je sais que je peux me désinscrire à tout moment.",
+    "subscribe": "S'abonner",
+    "successTitle": "Merci pour votre inscription!",
+    "successText": "Nous vous avons envoyé un email de confirmation. Veuillez cliquer sur le lien d'activation pour confirmer votre adresse email."
+  },
+  "instagram": {
+    "title": "Suivez-nous.",
+    "follow": "Suivre"
+  },
+  "footer": {
+    "legal": "Mentions légales",
+    "privacy": "Protection des données"
+  }
+}

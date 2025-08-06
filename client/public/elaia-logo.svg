@@ -1,0 +1,27 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cercle de fond -->
+  <circle cx="100" cy="100" r="90" fill="#FAF9F6" stroke="#D6B88F" stroke-width="2"/>
+  
+  <!-- Feuilles d'olivier stylisées -->
+  <g transform="translate(100, 100)">
+    <!-- Branche gauche -->
+    <path d="M-30,-20 Q-40,-10 -45,0 Q-40,10 -30,20" fill="none" stroke="#6A7352" stroke-width="3"/>
+    <ellipse cx="-35" cy="-15" rx="12" ry="6" fill="#BFCBB6" transform="rotate(-30 -35 -15)"/>
+    <ellipse cx="-40" cy="-5" rx="10" ry="5" fill="#6A7352" transform="rotate(-20 -40 -5)"/>
+    <ellipse cx="-40" cy="5" rx="10" ry="5" fill="#BFCBB6" transform="rotate(20 -40 5)"/>
+    <ellipse cx="-35" cy="15" rx="12" ry="6" fill="#6A7352" transform="rotate(30 -35 15)"/>
+    
+    <!-- Branche droite -->
+    <path d="M30,-20 Q40,-10 45,0 Q40,10 30,20" fill="none" stroke="#6A7352" stroke-width="3"/>
+    <ellipse cx="35" cy="-15" rx="12" ry="6" fill="#BFCBB6" transform="rotate(30 35 -15)"/>
+    <ellipse cx="40" cy="-5" rx="10" ry="5" fill="#6A7352" transform="rotate(20 40 -5)"/>
+    <ellipse cx="40" cy="5" rx="10" ry="5" fill="#BFCBB6" transform="rotate(-20 40 5)"/>
+    <ellipse cx="35" cy="15" rx="12" ry="6" fill="#6A7352" transform="rotate(-30 35 15)"/>
+  </g>
+  
+  <!-- Texte Elaïa -->
+  <text x="100" y="140" font-family="Alex Brush, cursive" font-size="36" fill="#D6B88F" text-anchor="middle">Elaïa</text>
+  
+  <!-- Sous-titre -->
+  <text x="100" y="160" font-family="Montserrat, sans-serif" font-size="10" fill="#6A7352" text-anchor="middle" letter-spacing="2">STUDIO</text>
+</svg> 

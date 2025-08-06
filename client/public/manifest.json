@@ -1,0 +1,22 @@
+{
+  "name": "Elaïa Studio",
+  "short_name": "Elaïa",
+  "description": "Votre studio de Pilates Reformer à Gland",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#D6B88F",
+  "background_color": "#FAF9F6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+} 
