@@ -304,8 +304,8 @@ export default function MainLayout() {
                 <li>Rue de la Gare 15</li>
                 <li>1196 Gland, Suisse</li>
                 <li className="pt-2">
-                  <a href="tel:+41791234567" className="hover:text-white transition-colors">
-                    +41 79 123 45 67
+                  <a href="tel:+41797181009" className="hover:text-white transition-colors">
+                    079 718 10 09
                   </a>
                 </li>
                 <li>

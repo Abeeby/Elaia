@@ -2,7 +2,7 @@ import React from 'react';
 import { MessageCircle } from 'lucide-react';
 
 export default function WhatsAppButton() {
-  const whatsappNumber = '+41791234567'; // Numéro WhatsApp du studio
+  const whatsappNumber = '+41797181009'; // Numéro WhatsApp du studio
   const defaultMessage = 'Bonjour, je souhaite avoir des informations sur les cours chez Elaïa Studio.';
   
   const handleWhatsAppClick = () => {
