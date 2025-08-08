@@ -32,7 +32,7 @@ router.post('/register', validateRegister, async (req: Request, res: Response) =
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, first_name, last_name, phone, address, city, postal_code } = req.body;
+    const { email, password, first_name, last_name, phone, address, city, postal_code, referral_source, referrer_name, company_name } = req.body;
 
     // Vérifier si l'email existe déjà
     const { data: existingUser } = await supabaseAdmin
@@ -65,7 +65,10 @@ router.post('/register', validateRegister, async (req: Request, res: Response) =
         postal_code,
         role: 'client',
         credits: 5,
-        is_verified: true
+        is_verified: true,
+        referral_source: referral_source || null,
+        referrer_name: referrer_name || null,
+        company_name: company_name || null
       })
       .select()
       .single();
@@ -318,6 +321,90 @@ router.get('/me', async (req: Request, res: Response) => {
       success: false,
       message: 'Erreur lors de la récupération du profil' 
     });
+  }
+});
+
+// Route pour mettre à jour le profil
+router.put('/profile', async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: 'Token manquant' });
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
+
+    const updates = req.body || {};
+    const fields = Object.keys(updates).filter((k) => updates[k] !== undefined);
+    if (fields.length === 0) {
+      return res.json({ success: true, message: 'Aucune modification' });
+    }
+
+    const { error: updateError } = await supabaseAdmin
+      .from('users')
+      .update({ ...updates })
+      .eq('id', decoded.id);
+
+    if (updateError) {
+      console.error('Erreur mise à jour profil:', updateError);
+      return res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du profil' });
+    }
+
+    const { data: userData } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('id', decoded.id)
+      .single();
+
+    return res.json({ success: true, message: 'Profil mis à jour', user: userData });
+  } catch (error) {
+    console.error('Erreur profil:', error);
+    res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du profil' });
+  }
+});
+
+// Route pour changer le mot de passe
+router.post('/change-password', [
+  body('current_password').notEmpty(),
+  body('new_password').isLength({ min: 6 })
+], async (req: Request, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: 'Token manquant' });
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
+    const { current_password, new_password } = req.body as any;
+
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, password_hash')
+      .eq('id', decoded.id)
+      .single();
+    if (userError || !userData) return res.status(404).json({ message: 'Utilisateur introuvable' });
+
+    const isValid = await bcrypt.compare(current_password, userData.password_hash);
+    if (!isValid) return res.status(401).json({ message: 'Mot de passe actuel incorrect' });
+
+    const newHash = await bcrypt.hash(new_password, 10);
+    const { error: updError } = await supabaseAdmin
+      .from('users')
+      .update({ password_hash: newHash })
+      .eq('id', decoded.id);
+    if (updError) throw updError;
+
+    res.json({ message: 'Mot de passe modifié avec succès' });
+  } catch (error) {
+    console.error('Erreur changement mot de passe:', error);
+    res.status(500).json({ message: 'Erreur lors du changement de mot de passe' });
   }
 });
 

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabaseAuth } from '../lib/supabase';
+import { authService } from '../services/api';
 import customToast from '../utils/toast';
 
 interface User {
@@ -60,64 +60,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   initAuth: async () => {
     try {
-      const user = await supabaseAuth.getUser();
-      if (user) {
-        set({ 
-          user: user as User, 
-          isAuthenticated: true,
-          isLoading: false 
-        });
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const data = await authService.getProfile();
+      if (data?.user) {
+        set({ user: data.user as User, isAuthenticated: true, isLoading: false });
       }
     } catch (error) {
       console.error('Erreur lors de l\'initialisation de l\'auth:', error);
+      localStorage.removeItem('token');
+      set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
 
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      // Essayer d'abord avec Supabase
-      try {
-        const { user } = await supabaseAuth.signIn(email, password);
-        set({ 
-          user: user as User, 
-          isAuthenticated: true,
-          isLoading: false 
-        });
+      const response = await authService.login(email, password);
+      if (response?.token && response?.user) {
+        localStorage.setItem('token', response.token);
+        set({ user: response.user as User, isAuthenticated: true, isLoading: false });
         customToast.success('Connexion réussie');
         return;
-      } catch (supabaseError: any) {
-        // Si l'erreur indique que Supabase n'est pas configuré, essayer le mode démo
-        if (supabaseError.message?.includes('Mode démo activé')) {
-          // Mode démo - vérifier les comptes de test
-          if (email === 'admin@elaiastudio.ch' && password === 'admin123') {
-            const demoUser = DEMO_USERS['admin@elaiastudio.ch'];
-            set({ 
-              user: demoUser as User, 
-              isAuthenticated: true,
-              isLoading: false 
-            });
-            customToast.success('Connexion réussie (mode démo)');
-            return;
-          }
-          
-          if (email === 'marie.dupont@email.com' && password === 'client123') {
-            const demoUser = DEMO_USERS['marie.dupont@email.com'];
-            set({ 
-              user: demoUser as User, 
-              isAuthenticated: true,
-              isLoading: false 
-            });
-            customToast.success('Connexion réussie (mode démo)');
-            return;
-          }
-          
-          throw new Error('Email ou mot de passe incorrect');
-        }
-        
-        // Si c'est une autre erreur Supabase, la propager
-        throw supabaseError;
       }
+      throw new Error('Réponse de connexion invalide');
     } catch (error: any) {
       set({ isLoading: false });
       customToast.error(error.message || 'Erreur de connexion');
@@ -128,59 +94,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (userData: any) => {
     set({ isLoading: true });
     try {
-      // Essayer avec Supabase
-      try {
-        const { user } = await supabaseAuth.signUp(
-          userData.email,
-          userData.password,
-          {
-            first_name: userData.first_name,
-            last_name: userData.last_name,
-            phone: userData.phone,
-            role: 'client',
-            credits: 0,
-          }
-        );
-        
-        if (user) {
-          set({ 
-            user: {
-              id: user.id,
-              email: user.email!,
-              first_name: userData.first_name,
-              last_name: userData.last_name,
-              phone: userData.phone,
-              role: 'client',
-              credits: 0,
-            }, 
-            isAuthenticated: true,
-            isLoading: false 
-          });
-          customToast.success('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
-        }
-      } catch (supabaseError: any) {
-        // Si Supabase n'est pas configuré, utiliser le mode démo
-        if (supabaseError.message?.includes('Mode démo activé')) {
-          const demoUser = {
-            id: `demo-${Date.now()}`,
-            email: userData.email,
-            first_name: userData.first_name,
-            last_name: userData.last_name,
-            phone: userData.phone,
-            role: 'client',
-            credits: 0,
-          };
-          
-          set({ 
-            user: demoUser as User, 
-            isAuthenticated: true,
-            isLoading: false 
-          });
-          
-          customToast.success('Inscription réussie (mode démo)');
-        } else {
-          throw supabaseError;
-        }
+      const response = await authService.register(userData);
+      if (response?.token && response?.user) {
+        localStorage.setItem('token', response.token);
+        set({ user: response.user as User, isAuthenticated: true, isLoading: false });
+        customToast.success('Inscription réussie !');
+      } else {
+        throw new Error("Réponse d'inscription invalide");
       }
     } catch (error: any) {
       set({ isLoading: false });
@@ -190,7 +110,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: () => {
-    supabaseAuth.signOut().catch(console.error);
+    try { localStorage.removeItem('token'); } catch {}
     set({ 
       user: null, 
       token: null, 
@@ -201,10 +121,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   fetchProfile: async () => {
     try {
-      const user = await supabaseAuth.getUser();
-      if (user) {
-        set({ user: user as User });
-      }
+      const data = await authService.getProfile();
+      if (data?.user) set({ user: data.user as User });
     } catch (error) {
       console.error('Erreur lors de la récupération du profil:', error);
     }

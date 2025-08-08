@@ -193,17 +193,19 @@ export const adminService = {
     return response.data;
   },
 
-  // Nouvelles méthodes pour la gestion des crédits
+  // Gestion Supabase: crédits et parrainage
   addCredits: async (userEmail: string, credits: number) => {
-    const response = await api.post('/admin/add-credits', {
-      userEmail,
-      credits
-    });
+    const response = await api.post('/admin/add-credits', { userEmail, credits });
     return response.data;
   },
 
   getUsersWithCredits: async () => {
     const response = await api.get('/admin/users');
+    return response.data;
+  },
+
+  updateReferralForUser: async (userId: string, referrerName: string) => {
+    const response = await api.post(`/admin/users/${userId}/referral`, { referrer_name: referrerName });
     return response.data;
   },
 }; 

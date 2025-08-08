@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, CreditCard, Plus, RefreshCw, Mail, AlertCircle, CheckCircle } from 'lucide-react';
+import { Users, CreditCard, Plus, RefreshCw, Mail, AlertCircle, CheckCircle, UserPlus } from 'lucide-react';
 import { adminService } from '../../services/api';
 
 interface User {
-  id: number;
+  id: string | number;
   email: string;
   first_name: string;
   last_name: string;
   role: string;
   credits_remaining: number;
+  referrer_name?: string | null;
+  referral_source?: string | null;
+  company_name?: string | null;
 }
 
 interface ApiError {
@@ -26,6 +29,10 @@ export default function AdminUsers() {
   const [creditsToAdd, setCreditsToAdd] = useState<number>(10);
   const [showAddCreditsModal, setShowAddCreditsModal] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [showReferralModal, setShowReferralModal] = useState(false);
+  const [referralUserId, setReferralUserId] = useState<string>('');
+  const [referralUserName, setReferralUserName] = useState<string>('');
+  const [referrerName, setReferrerName] = useState<string>('');
 
   // Récupérer la liste des utilisateurs
   const { data: usersData, isLoading, refetch } = useQuery({
@@ -58,6 +65,23 @@ export default function AdminUsers() {
         type: 'error',
         message: error.response?.data?.error || 'Erreur lors de l\'ajout des crédits'
       });
+      setTimeout(() => setNotification(null), 5000);
+    },
+  });
+
+  // Mutation pour mettre à jour le parrain
+  const updateReferralMutation = useMutation({
+    mutationFn: ({ userId, referrerName }: { userId: string; referrerName: string }) =>
+      adminService.updateReferralForUser(userId, referrerName),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users-credits'] });
+      setNotification({ type: 'success', message: 'Parrain mis à jour' });
+      setShowReferralModal(false);
+      setReferrerName('');
+      setTimeout(() => setNotification(null), 4000);
+    },
+    onError: () => {
+      setNotification({ type: 'error', message: 'Erreur lors de la mise à jour du parrain' });
       setTimeout(() => setNotification(null), 5000);
     },
   });
@@ -178,13 +202,16 @@ export default function AdminUsers() {
                       Crédits
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Parrainage
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {users.map((user: User) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                    <tr key={String(user.id)} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
@@ -219,6 +246,12 @@ export default function AdminUsers() {
                           <span className="text-sm text-gray-500 ml-1">crédits</span>
                         </div>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                        <div>
+                          <div className="font-medium">{user.referrer_name || '-'}</div>
+                          <div className="text-xs text-gray-500">{user.referral_source || ''}{user.company_name ? ` • ${user.company_name}` : ''}</div>
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() => {
@@ -229,6 +262,18 @@ export default function AdminUsers() {
                         >
                           <Plus className="h-4 w-4" />
                           <span>Ajouter crédits</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setReferralUserId(String(user.id));
+                            setReferralUserName(`${user.first_name} ${user.last_name}`);
+                            setReferrerName(user.referrer_name || '');
+                            setShowReferralModal(true);
+                          }}
+                          className="text-elaia-gold hover:text-elaia-green flex items-center space-x-1 ml-4"
+                        >
+                          <UserPlus className="h-4 w-4" />
+                          <span>Parrainage</span>
                         </button>
                       </td>
                     </tr>
@@ -317,6 +362,51 @@ export default function AdminUsers() {
                     >
                       Annuler
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de parrainage */}
+        {showReferralModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+              <div className="mt-3">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">Parrainage</h3>
+                  <button onClick={() => setShowReferralModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-sm text-gray-600 mb-2">Utilisateur</div>
+                    <div className="text-sm font-medium">{referralUserName}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nom du parrain</label>
+                    <input
+                      type="text"
+                      value={referrerName}
+                      onChange={(e) => setReferrerName(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-elaia-gold"
+                      placeholder="Nom du parrain"
+                    />
+                  </div>
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      onClick={() => updateReferralMutation.mutate({ userId: referralUserId, referrerName })}
+                      disabled={updateReferralMutation.isPending}
+                      className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {updateReferralMutation.isPending ? (
+                        <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <UserPlus className="h-4 w-4 mr-2" />
+                      )}
+                      Enregistrer
+                    </button>
+                    <button onClick={() => setShowReferralModal(false)} className="flex-1 btn-secondary">Annuler</button>
                   </div>
                 </div>
               </div>

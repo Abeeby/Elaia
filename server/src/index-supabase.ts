@@ -7,6 +7,8 @@ import { supabaseAdmin } from './config/supabase';
 // Import routes
 import authDirectRoutes from './routes/auth-direct';
 import bookingsRoutes from './routes/bookings-supabase';
+import creditsRoutes from './routes/credits-supabase';
+import adminRoutes from './routes/admin-supabase';
 // Commenté car utilise database-pg
 // import { authMiddleware } from './middleware/auth';
 
@@ -71,6 +73,12 @@ app.use('/api/auth', authDirectRoutes);
 // Bookings routes (Supabase)
 app.use('/api/bookings', bookingsRoutes);
 
+// Credits routes (Supabase)
+app.use('/api/credits', creditsRoutes);
+
+// Admin routes (Supabase)
+app.use('/api/admin', adminRoutes);
+
 // Protected routes example
 app.get('/api/users/profile', authMiddleware, async (req: any, res) => {
   try {
@@ -122,25 +130,7 @@ app.get('/api/classes/schedule', async (req, res) => {
   }
 });
 
-// Credits routes
-app.get('/api/credits/plans', async (req, res) => {
-  try {
-    const { data, error } = await supabaseAdmin
-      .from('subscription_plans')
-      .select('*')
-      .order('price');
-
-    if (error) throw error;
-
-    res.json(data || []);
-  } catch (error) {
-    console.error('Erreur récupération plans:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Erreur lors de la récupération des plans' 
-    });
-  }
-});
+// (routes /api/credits/* gérées par creditsRoutes)
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

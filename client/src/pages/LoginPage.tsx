@@ -84,7 +84,7 @@ export default function LoginPage() {
           </div>
 
           {/* Demo accounts */}
-          <div className="mb-8 p-4 bg-elaia-white/50 rounded-lg border border-elaia-muted">
+            <div className="mb-8 p-4 bg-elaia-white/50 rounded-lg border border-elaia-muted">
             <p className="text-xs font-inter uppercase tracking-wider text-elaia-charcoal mb-3">
               Comptes de démonstration
             </p>
@@ -103,7 +103,8 @@ export default function LoginPage() {
               >
                 Client
               </button>
-            </div>
+              </div>
+              <p className="text-[11px] text-elaia-warm-gray mt-3">Utilisez ces identifiants en démo si l'auth n'est pas configurée.</p>
           </div>
 
           {/* Form */}

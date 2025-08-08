@@ -17,6 +17,9 @@ interface RegisterFormData {
   address: string;
   city: string;
   postal_code: string;
+  referral_source?: string;
+  company_name?: string;
+  referrer_name?: string;
   acceptTerms: boolean;
 }
 
@@ -34,6 +37,7 @@ export default function RegisterPage() {
   } = useForm<RegisterFormData>();
 
   const password = watch('password');
+  const referralSource = watch('referral_source');
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -121,6 +125,41 @@ export default function RegisterPage() {
           )}
         </div>
 
+        {/* Comment avez-vous connu ELAÏA ? */}
+        <div>
+          <label className="block text-sm font-inter uppercase tracking-wider text-elaia-charcoal mb-3">
+            Comment avez-vous connu ELAÏA ?
+          </label>
+          <select
+            {...register('referral_source')}
+            className="input-field"
+          >
+            <option value="">Sélectionner...</option>
+            <option value="amis_famille">Amis / Famille</option>
+            <option value="entreprise">Entreprise</option>
+            <option value="facebook">Facebook</option>
+            <option value="instagram">Instagram</option>
+            <option value="tiktok">TikTok</option>
+            <option value="autre">Autre</option>
+          </select>
+          <p className="mt-2 text-xs text-elaia-warm-gray">Cette information nous aide à améliorer notre communication.</p>
+        </div>
+
+        {/* Nom de l'entreprise (si entreprise) */}
+        {referralSource === 'entreprise' && (
+        <div>
+          <label className="block text-sm font-inter uppercase tracking-wider text-elaia-charcoal mb-3">
+            Nom de l'entreprise (si applicable)
+          </label>
+          <input
+            {...register('company_name')}
+            type="text"
+            className="input-field"
+            placeholder="Nom de l'entreprise"
+          />
+        </div>
+        )}
+
         {/* Confirmation Email */}
         <div>
             <label className="block text-sm font-inter uppercase tracking-wider text-elaia-charcoal mb-3">
@@ -160,6 +199,20 @@ export default function RegisterPage() {
           {errors.phone && (
               <p className="mt-2 text-sm text-red-600">{errors.phone.message}</p>
           )}
+        </div>
+
+        {/* Parrainage */}
+        <div>
+          <label className="block text-sm font-inter uppercase tracking-wider text-elaia-charcoal mb-3">
+            Parrainage (nom du parrain)
+          </label>
+          <input
+            {...register('referrer_name')}
+            type="text"
+            className="input-field"
+            placeholder="Nom du parrain"
+          />
+          <p className="mt-2 text-xs text-elaia-warm-gray">Si un ami vous a recommandé, indiquez son nom pour le remercier.</p>
         </div>
 
         {/* Adresse */}
