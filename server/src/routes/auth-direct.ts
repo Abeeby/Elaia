@@ -51,27 +51,39 @@ router.post('/register', validateRegister, async (req: Request, res: Response) =
     // Hasher le mot de passe
     const password_hash = await bcrypt.hash(password, 10);
 
-    // Créer le profil utilisateur
-    const { data: userData, error: userError } = await supabaseAdmin
-      .from('users')
-      .insert({
-        email,
-        password_hash,
-        first_name,
-        last_name,
-        phone,
-        address,
-        city,
-        postal_code,
-        role: 'client',
-        credits: 5,
-        is_verified: true,
-        referral_source: referral_source || null,
-        referrer_name: referrer_name || null,
-        company_name: company_name || null
-      })
-      .select()
-      .single();
+    // Créer le profil utilisateur (avec repli si colonnes de parrainage manquent)
+    let userData: any = null;
+    let userError: any = null;
+    const basePayload: any = {
+      email,
+      password_hash,
+      first_name,
+      last_name,
+      phone,
+      address,
+      city,
+      postal_code,
+      role: 'client',
+      credits: 5,
+      is_verified: true,
+    };
+    const extendedPayload: any = {
+      ...basePayload,
+      referral_source: (req.body as any)?.referral_source ?? null,
+      referrer_name: (req.body as any)?.referrer_name ?? null,
+      company_name: (req.body as any)?.company_name ?? null,
+    };
+
+    // Tentative avec colonnes étendues
+    let insertResp = await supabaseAdmin.from('users').insert(extendedPayload).select().single();
+    userData = insertResp.data; userError = insertResp.error;
+
+    // Si erreur (colonnes manquantes), retenter sans champs optionnels
+    if (userError) {
+      console.warn('Insertion avec champs de parrainage échouée, tentative sans champs optionnels...');
+      const fallback = await supabaseAdmin.from('users').insert(basePayload).select().single();
+      userData = fallback.data; userError = fallback.error;
+    }
 
     if (userError) {
       console.error('Erreur création profil:', userError);

@@ -161,10 +161,17 @@ async function startServer() {
       console.log('✅ Connexion Supabase établie');
     }
 
-    app.listen(PORT, () => {
+    // Éviter EADDRINUSE lors des redémarrages nodemon
+    const server = app.listen(PORT, () => {
       console.log(`🚀 Serveur ELAÏA Studio démarré sur le port ${PORT}`);
       console.log(`📍 API disponible sur http://localhost:${PORT}/api`);
       console.log(`🔗 Supabase: ${process.env.SUPABASE_URL}`);
+    });
+    server.on('error', (err: any) => {
+      if (err?.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} déjà utilisé. Relancez en stoppant les autres instances.`);
+        process.exit(1);
+      }
     });
   } catch (error) {
     console.error('❌ Erreur démarrage serveur:', error);
