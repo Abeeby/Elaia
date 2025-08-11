@@ -39,7 +39,7 @@ router.get('/plans', async (_req: Request, res: Response) => {
     const { data, error } = await supabaseAdmin
       .from('subscription_plans')
       .select('*')
-      .eq('is_active', true)
+      .eq('status', 'active')
       .order('price');
 
     if (error) throw error;
@@ -62,7 +62,7 @@ router.get(['/subscription', '/my-subscription'], authMiddleware, async (req: an
         subscription_plans:plan_id (*)
       `)
       .eq('user_id', userId)
-      .eq('is_active', true)
+      .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
@@ -124,7 +124,7 @@ router.post('/subscribe', authMiddleware, async (req: any, res: Response) => {
       .from('subscription_plans')
       .select('*')
       .eq('id', plan_id)
-      .eq('is_active', true)
+      .eq('status', 'active')
       .single();
     if (planError || !plan) return res.status(404).json({ message: "Plan d'abonnement non trouvé" });
 
@@ -133,7 +133,7 @@ router.post('/subscribe', authMiddleware, async (req: any, res: Response) => {
       .from('user_subscriptions')
       .select('*')
       .eq('user_id', userId)
-      .eq('is_active', true)
+      .eq('status', 'active')
       .maybeSingle();
     if (activeSubscription) {
       return res.status(400).json({ message: 'Vous avez déjà un abonnement actif', current_subscription: activeSubscription });
@@ -147,7 +147,7 @@ router.post('/subscribe', authMiddleware, async (req: any, res: Response) => {
         .from('promotions')
         .select('*')
         .eq('code', String(promo_code).toUpperCase())
-        .eq('is_active', true)
+        .eq('status', 'active')
         .maybeSingle();
       if (promo) {
         if (promo.discount_type === 'percentage') {
@@ -184,7 +184,7 @@ router.post('/subscribe', authMiddleware, async (req: any, res: Response) => {
         plan_id,
         start_date: startDate.toISOString(),
         end_date: endDate ? endDate.toISOString() : null,
-        is_active: true,
+        status: 'active',
         credits_remaining: plan.credits || 0,
       })
       .select('*')
@@ -238,7 +238,7 @@ router.post(['/buy', '/buy-credits'], authMiddleware, async (req: any, res: Resp
       .from('user_subscriptions')
       .select('*, subscription_plans:plan_id (type)')
       .eq('user_id', userId)
-      .eq('is_active', true)
+      .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
       .single();

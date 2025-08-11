@@ -43,10 +43,7 @@ router.get('/my-bookings', authMiddleware, async (req: any, res: Response) => {
       .from('bookings')
       .select(`
         *,
-        class_sessions (
-          *,
-          class_types (*)
-        )
+        classes (*)
       `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
@@ -80,7 +77,7 @@ router.post('/book', authMiddleware, async (req: any, res: Response) => {
 
     // Vérifier la session de cours
     const { data: classSession, error: classError } = await supabaseAdmin
-      .from('class_sessions')
+      .from('classes')
       .select(`
         *,
         class_types (*)
@@ -152,7 +149,7 @@ router.post('/book', authMiddleware, async (req: any, res: Response) => {
 
     // Incrémenter les participants
     await supabaseAdmin
-      .from('class_sessions')
+      .from('classes')
       .update({ current_participants: classSession.current_participants + 1 })
       .eq('id', class_id);
 
@@ -195,10 +192,7 @@ router.post('/cancel/:bookingId', authMiddleware, async (req: any, res: Response
       .from('bookings')
       .select(`
         *,
-        class_sessions (
-          *,
-          class_types (*)
-        )
+        classes (*)
       `)
       .eq('id', bookingId)
       .eq('user_id', userId)
@@ -219,7 +213,7 @@ router.post('/cancel/:bookingId', authMiddleware, async (req: any, res: Response
     }
 
     // Vérifier le délai d'annulation (24h minimum)
-    const classTime = new Date(booking.class_sessions.start_time);
+    const classTime = new Date(booking.classes.start_time);
     const now = new Date();
     const hoursBeforeClass = (classTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
@@ -248,9 +242,9 @@ router.post('/cancel/:bookingId', authMiddleware, async (req: any, res: Response
 
     // Décrémenter les participants
     await supabaseAdmin
-      .from('class_sessions')
+      .from('classes')
       .update({ 
-        current_participants: booking.class_sessions.current_participants - 1 
+        current_participants: booking.classes.current_participants - 1 
       })
       .eq('id', booking.class_session_id);
 
@@ -261,7 +255,7 @@ router.post('/cancel/:bookingId', authMiddleware, async (req: any, res: Response
         user_id: userId,
         amount: booking.credits_used,
         type: 'refund',
-        description: `Annulation ${booking.class_sessions.class_types.name}`,
+        description: `Annulation ${booking.classes.class_types.name}`,
         reference_id: booking.id
       });
 
