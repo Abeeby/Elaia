@@ -39,7 +39,6 @@ router.get('/plans', async (_req: Request, res: Response) => {
     const { data, error } = await supabaseAdmin
       .from('subscription_plans')
       .select('*')
-      .eq('status', 'active')
       .order('price');
 
     if (error) throw error;
