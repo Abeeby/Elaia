@@ -35,12 +35,16 @@ CREATE TABLE IF NOT EXISTS credit_history (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
--- 6. CRÉER UNE VUE POUR COMPATIBILITÉ (si bookings utilise classes)
+-- 6. GÉRER LA COMPATIBILITÉ CLASSES/CLASS_SESSIONS
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'class_sessions') 
-    AND EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'classes') THEN
-        EXECUTE 'CREATE VIEW class_sessions AS SELECT * FROM classes';
+    -- Vérifier si class_sessions existe (table ou vue)
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'class_sessions') 
+    OR EXISTS (SELECT 1 FROM information_schema.views WHERE table_name = 'class_sessions') THEN
+        RAISE NOTICE 'class_sessions existe déjà';
+    ELSIF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'classes') THEN
+        -- Créer la vue seulement si elle n'existe pas
+        EXECUTE 'CREATE OR REPLACE VIEW class_sessions AS SELECT * FROM classes';
         RAISE NOTICE 'Vue class_sessions créée pour compatibilité';
     END IF;
 END $$;
