@@ -11,11 +11,13 @@
     "start:railway": "npm run build && NODE_ENV=production node src/index-railway.js",
     "test:railway": "node test-railway.js",
     "init-db": "ts-node src/utils/initDb.ts",
-    "init-supabase": "ts-node src/utils/init-supabase.ts"
+    "init-supabase": "ts-node src/utils/init-supabase.ts",
+    "init-test-data": "ts-node src/utils/init-supabase-test-data.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.3",
     "@types/bcrypt": "^5.0.2",
+    "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

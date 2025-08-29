@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Check } from 'lucide-react';
 import customToast from '../utils/toast';
 import { useAuthStore } from '../store/authStore';
-import DemoNotice from '../components/DemoNotice';
+
 
 interface RegisterFormData {
   email: string;
@@ -66,7 +66,7 @@ export default function RegisterPage() {
       </p>
         </div>
 
-      <DemoNotice />
+      
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-elaia-white border border-elaia-muted p-8">

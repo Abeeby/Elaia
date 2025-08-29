@@ -21,14 +21,14 @@ if (-not (Test-Path $clientEnvPath)) {
 
 # Démarrer le serveur backend avec Supabase
 Write-Host "`n📦 Démarrage du serveur backend avec Supabase sur le port 5001..." -ForegroundColor Green
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd server; npm run dev:supabase"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd server; npm run dev:supabase" -WorkingDirectory $PSScriptRoot
 
 # Attendre un peu pour que le serveur démarre
 Start-Sleep -Seconds 3
 
 # Démarrer le client frontend
 Write-Host "🎨 Démarrage du client frontend sur le port 5173..." -ForegroundColor Green
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd client; npm run dev"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd client; npm run dev" -WorkingDirectory $PSScriptRoot
 
 # Afficher les informations
 Write-Host "`n✅ ELAÏA Studio est en cours d'exécution !" -ForegroundColor Green

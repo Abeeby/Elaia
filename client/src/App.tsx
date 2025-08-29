@@ -36,6 +36,9 @@ import SubscriptionPage from './pages/SubscriptionPage';
 import CreditHistoryPage from './pages/CreditHistoryPage';
 import ProspectsPage from './pages/ProspectsPage';
 import TrialPage from './pages/TrialPage';
+import BuyCreditsPage from './pages/BuyCreditsPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentCancelPage from './pages/PaymentCancelPage';
 
 // Pages admin
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -142,8 +145,15 @@ function AppContent() {
             <Route path="bookings" element={<BookingsPage />} />
             <Route path="subscription" element={<SubscriptionPage />} />
             <Route path="credit-history" element={<CreditHistoryPage />} />
+            <Route path="buy-credits" element={<BuyCreditsPage />} />
             <Route path="prospects" element={<ProspectsPage />} />
             <Route path="trial" element={<TrialPage />} />
+          </Route>
+
+          {/* Routes de paiement */}
+          <Route path="payment">
+            <Route path="success" element={<PaymentSuccessPage />} />
+            <Route path="cancel" element={<PaymentCancelPage />} />
           </Route>
           
           {/* Routes admin */}

@@ -9,6 +9,7 @@ import authDirectRoutes from './routes/auth-direct';
 import bookingsRoutes from './routes/bookings-supabase';
 import creditsRoutes from './routes/credits-supabase';
 import adminRoutes from './routes/admin-supabase';
+import paymentsRoutes from './routes/payments';
 // Commenté car utilise database-pg
 // import { authMiddleware } from './middleware/auth';
 
@@ -78,6 +79,9 @@ app.use('/api/credits', creditsRoutes);
 
 // Admin routes (Supabase)
 app.use('/api/admin', adminRoutes);
+
+// Payments routes (Payrexx)
+app.use('/api/payments', paymentsRoutes);
 
 // Protected routes example
 app.get('/api/users/profile', authMiddleware, async (req: any, res) => {

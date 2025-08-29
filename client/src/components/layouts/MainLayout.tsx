@@ -4,6 +4,7 @@ import { Menu, X, User, LogOut, Calendar, CreditCard, LayoutDashboard } from 'lu
 import { useAuthStore } from '../../store/authStore';
 import customToast from '../../utils/toast';
 import WhatsAppButton from '../WhatsAppButton';
+import NotificationManager from '../NotificationManager';
 
 export default function MainLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -92,6 +93,7 @@ export default function MainLayout() {
                   >
                     <User className="h-5 w-5" />
                   </Link>
+                  <NotificationManager />
                   
                   {/* User info */}
                   <div className="flex items-center space-x-3 pl-4 border-l border-elaia-muted">
