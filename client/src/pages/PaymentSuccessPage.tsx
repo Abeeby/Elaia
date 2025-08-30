@@ -15,7 +15,7 @@ const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { user, refreshProfile } = useAuthStore();
+  const { user, fetchProfile } = useAuthStore();
 
   const sessionId = searchParams.get('session_id');
 
@@ -31,7 +31,7 @@ const PaymentSuccessPage = () => {
         // Pour l'instant, on considère que le paiement est réussi si on arrive ici
 
         // Rafraîchir le profil utilisateur pour mettre à jour les crédits
-        await refreshProfile();
+        await fetchProfile();
 
         // Simuler les détails du paiement (en production, récupérer depuis l'API)
         setPaymentDetails({
@@ -50,7 +50,7 @@ const PaymentSuccessPage = () => {
     };
 
     verifyPayment();
-  }, [sessionId, refreshProfile]);
+  }, [sessionId, fetchProfile]);
 
   if (isLoading) {
     return (

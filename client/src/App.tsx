@@ -7,7 +7,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { useAuthStore } from './store/authStore';
 
 // Mobile features
-import { useMobileFeatures } from './mobile/MobileApp';
+import { useMobileApp } from './mobile/MobileApp';
 
 // Layouts
 import MainLayout from './components/layouts/MainLayout';
@@ -111,7 +111,8 @@ class ErrorBoundary extends React.Component<
 
 function AppContent() {
   const initAuth = useAuthStore((state) => state.initAuth);
-  const { isNative, platform } = useMobileFeatures();
+  useMobileApp(); // Initialize mobile features
+  const { isNative, platform } = { isNative: false, platform: 'web' };
 
   useEffect(() => {
     // Initialiser l'authentification au démarrage
